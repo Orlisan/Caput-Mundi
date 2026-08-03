@@ -1,15 +1,14 @@
 {
-	"required": true,
-	"package": "io.github.orlisan.caputmundi.mixin",
-	"compatibilityLevel": "JAVA_25",
-	"mixins": [
-		"EquipmentSlotMixin",
-		"LivingEntityHurtMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "package": "io.github.orlisan.caputmundi.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "LivingEntityHurtMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }
