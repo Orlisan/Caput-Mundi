@@ -23,7 +23,7 @@ public class LaurusBlock extends CropBlock {
     @Override
     protected @NotNull InteractionResult useItemOn(@NotNull ItemStack itemStack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
         if (itemStack.is(Items.SHEARS) && state.getValue(CropBlock.AGE) > 5) {
-            level.addFreshEntity(new ItemEntity(level, Math.random() > 0.5 ? pos.getX() + 0.5 : pos.getX() - 0.5, pos.getY() + 0.5, Math.random() > 0.5 ? pos.getZ() + 0.5 : pos.getZ() - 0.5, new ItemStack(CaputMundiItems.LAURUS_LEAVE)));
+            level.addFreshEntity(new ItemEntity(level, Math.random() > 0.5 ? pos.getX() + 0.5 : pos.getX() - 0.5, pos.getY() + 0.5, Math.random() > 0.5 ? pos.getZ() + 0.5 : pos.getZ() - 0.5, new ItemStack(CaputMundiItems.LAURUS_LEAF)));
             level.setBlock(pos, state.setValue(AGE, state.getValue(AGE) - 1), 2);
             return InteractionResult.SUCCESS;
         }

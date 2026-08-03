@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "L L",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "caput_mundi:laurus_leaves"
+    }
+  },
+  "result": {
+    "id": "caput_mundi:laurus_crown",
+    "count": 1
+  }
+}

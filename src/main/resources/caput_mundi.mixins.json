@@ -3,7 +3,8 @@
   "package": "io.github.orlisan.caputmundi.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "LivingEntityHurtMixin"
+    "LivingEntityHurtMixin",
+    "PotionBrewingMixin"
   ],
   "injectors": {
     "defaultRequire": 1
