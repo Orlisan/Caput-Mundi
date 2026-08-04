@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animazione_piede_che_si_siede": {
+		"animazione_volo": {
 			"loop": true,
 			"animation_length": 2.5,
 			"bones": {

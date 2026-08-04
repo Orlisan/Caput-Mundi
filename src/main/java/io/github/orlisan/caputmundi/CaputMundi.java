@@ -2,6 +2,7 @@ package io.github.orlisan.caputmundi;
 
 import com.geckolib.GeckoLib;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
+import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;
 import net.fabricmc.api.ModInitializer;
@@ -27,6 +28,7 @@ public class CaputMundi implements ModInitializer {
         CaputMundiBlocks.register();
         CaputMundiItems.register();
         CaputMundiPotions.register();
+        CaputMundiEntities.register();
         LOGGER.info("Hello Fabric world!");
     }
 

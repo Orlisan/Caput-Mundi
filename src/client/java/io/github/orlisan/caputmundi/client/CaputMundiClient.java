@@ -1,7 +1,10 @@
 package io.github.orlisan.caputmundi.client;
 
+import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
+import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
@@ -11,6 +14,10 @@ public class CaputMundiClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        EntityRenderers.register(
+                CaputMundiEntities.AQUILA,
+                AquilaRenderer::new
+        );
         //Builder per aggirare il voluto final delle lambda
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (client.level != null && client.level.getLevelData().isHardcore()) {
