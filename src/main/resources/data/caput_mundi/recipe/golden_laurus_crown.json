@@ -6,12 +6,8 @@
     "III"
   ],
   "key": {
-    "L": {
-      "item": "caput_mundi:laurus_crown"
-    },
-    "I": {
-      "item": "caput_mundi:imperial_gold_ingot"
-    }
+    "L": "caput_mundi:laurus_crown",
+    "I": "caput_mundi:imperial_gold_ingot"
   },
   "result": {
     "id": "caput_mundi:golden_laurus_crown",

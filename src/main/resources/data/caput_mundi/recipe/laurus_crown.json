@@ -6,9 +6,7 @@
     "LLL"
   ],
   "key": {
-    "L": {
-      "item": "caput_mundi:laurus_leaves"
-    }
+    "L": "caput_mundi:laurus_leaves"
   },
   "result": {
     "id": "caput_mundi:laurus_crown",

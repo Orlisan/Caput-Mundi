@@ -1,5 +1,6 @@
 package io.github.orlisan.caputmundi;
 
+import com.geckolib.GeckoLib;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;

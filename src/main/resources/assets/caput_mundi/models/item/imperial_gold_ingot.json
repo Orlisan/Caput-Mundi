@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "caput_mundi:item/imperial_gold_ingot"
+  }
+}
