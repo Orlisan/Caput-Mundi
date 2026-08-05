@@ -31,7 +31,7 @@ public class CaputMundiEntities {
     }
 
     public static void register() {
-        FabricDefaultAttributeRegistry.register(AQUILA, AquilaEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(AQUILA, AquilaEntity.createAttributes());
         BiomeModifications.addSpawn(BiomeSelectors.includeByKey(
                         Biomes.TAIGA,
                         Biomes.SNOWY_TAIGA,

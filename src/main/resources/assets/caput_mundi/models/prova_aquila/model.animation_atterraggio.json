@@ -1,0 +1,143 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animazione_atterraggio": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 1.25,
+			"bones": {
+				"foot": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, -97.5]
+						}
+					}
+				},
+				"foot2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, -95]
+						}
+					}
+				},
+				"gamba_destra": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, -35]
+						}
+					}
+				},
+				"gamba_sinistra": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, -37.5]
+						}
+					}
+				},
+				"spalla_sinistra": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.75": {
+							"vector": [37.5, 0, 0]
+						},
+						"1.25": {
+							"vector": [67.5, 0, 0]
+						}
+					}
+				},
+				"corpo": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, -52.5]
+						}
+					}
+				},
+				"radio/ulna": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [-105, 0, 0]
+						},
+						"1.25": {
+							"vector": [-155, 0, 0]
+						}
+					}
+				},
+				"osso_mano": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.25": {
+							"vector": [180, 0, 0]
+						}
+					}
+				},
+				"spalla_destra": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.75": {
+							"vector": [-30, 0, 0]
+						},
+						"1.25": {
+							"vector": [-72.5, 0, 0]
+						}
+					}
+				},
+				"radio/ulna2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [115, 0, 0]
+						},
+						"1.25": {
+							"vector": [162.5, 0, 0]
+						}
+					}
+				},
+				"osso_mano2": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.25": {
+							"vector": [-177.5, 0, 0]
+						}
+					}
+				},
+				"collo": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [0, 0, 50]
+						}
+					}
+				}
+			}
+		}
+	}
+}

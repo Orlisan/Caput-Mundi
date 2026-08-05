@@ -1301,12 +1301,14 @@
 		{
 			"name": "anello",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 		},
 		{
 			"name": "foglie",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [
 				20,
@@ -1384,6 +1386,7 @@
 		{
 			"name": "bacche",
 			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
 			"children": [90, 91, 92, 93, 94, 95, 96]
 		}
