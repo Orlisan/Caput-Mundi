@@ -25,7 +25,7 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
 
     @Override
     public boolean canContinueToUse() {
-        return entity.getNavigation().isDone();
+        return !entity.getNavigation().isDone();
     }
 
   /*  @Override

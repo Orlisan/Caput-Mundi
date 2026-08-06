@@ -8,6 +8,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import io.github.orlisan.caputmundi.entities.goals.DecolloGoal;
+import io.github.orlisan.caputmundi.entities.goals.RuotaInCerchioGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -27,9 +28,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public boolean isFlying = false;
     public boolean startDecollo = true;
     private boolean startAnimDecollo = true;
-
+    public static final BlockPos NO_CENTER = new BlockPos(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
     public boolean ruotaInCerchio = false;
-    public BlockPos centroCerchio = DecolloGoal.failPos;
+    public boolean startAnimCerchio = false;
+    public BlockPos centroCerchio = NO_CENTER;
+    //TODO:Mettere addomesticamento e coso client mixin a Hud.class
     public ServerPlayer padrone = null;
     public static final double DURATA_VOLO = 2.5;
     protected AquilaEntity(EntityType<? extends PathfinderMob> type, Level level) {
@@ -43,8 +46,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
+        if(!startDecollo) {
+            startRuotaInCerchio();
+        }
     }
-
+    void startRuotaInCerchio() {
+        this.ruotaInCerchio = true;
+        this.startAnimCerchio = true;
+    }
     void startDecollo() {
         this.startDecollo = true;
         this.startAnimDecollo = true;
@@ -66,6 +75,15 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         RawAnimation.begin()
                                 .thenPlay("animazione_decollo").thenLoop("animazione_volo"));
                 startAnimDecollo = false;
+            }else if(startAnimCerchio) {
+                if(state.controller().getCurrentAnimationTime() % DURATA_VOLO < 0.1) {
+                    state.setAnimation(
+                            RawAnimation.begin()
+                                    .thenPlay("animazione_trans_inclinazione")
+                                    .thenLoop("animazione_volo_inclinato")
+                    );
+                    startAnimCerchio = false;
+                }
             }
             return PlayState.CONTINUE;
         }));
@@ -80,6 +98,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     protected void registerGoals() {
         //this.goalSelector.addGoal();
         this.goalSelector.addGoal(0, new DecolloGoal(this));
+        this.goalSelector.addGoal(1, new RuotaInCerchioGoal(this));
         super.registerGoals();
     }
 
