@@ -2,18 +2,36 @@ package io.github.orlisan.caputmundi.client;
 
 import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
+import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.resources.Identifier;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
 public class CaputMundiClient implements ClientModInitializer {
     StringBuilder vecchioSelected = new StringBuilder();
     public static boolean eraHardcore = false;
+    public static List<Identifier> vistaAquila = new ArrayList<>();
+    boolean giaSettataVista = false;
 
     @Override
     public void onInitializeClient() {
+        ClientPlayNetworking.registerGlobalReceiver(AquilaVistaPacket.TYPE, (packet, context) -> {
+            context.client().execute(() -> {
+                if (!giaSettataVista) {
+                    for (String str : packet.blockIds()) {
+                        vistaAquila.add(Identifier.parse(str));
+                    }
+                    giaSettataVista = true;
+                }
+            });
+        });
         EntityRenderers.register(
                 CaputMundiEntities.AQUILA,
                 AquilaRenderer::new
@@ -39,5 +57,7 @@ public class CaputMundiClient implements ClientModInitializer {
             }
         });
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
+    }
+    public record coords2d(int x, int y) {
     }
 }

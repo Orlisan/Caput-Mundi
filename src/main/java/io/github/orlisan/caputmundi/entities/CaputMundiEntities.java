@@ -23,7 +23,7 @@ public class CaputMundiEntities {
 
     public static final EntityType<@NotNull AquilaEntity> AQUILA = Registry.register(BuiltInRegistries.ENTITY_TYPE,
             Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila"),
-            EntityType.Builder.of(AquilaEntity::new, MobCategory.CREATURE).sized(0.6f, 0.8f).build(keyOf("aquila"))
+            EntityType.Builder.of(AquilaEntity::new, MobCategory.CREATURE).sized(1.5f, 0.4f).build(keyOf("aquila"))
     );
 
     private static ResourceKey<EntityType<?>> keyOf(String name) {

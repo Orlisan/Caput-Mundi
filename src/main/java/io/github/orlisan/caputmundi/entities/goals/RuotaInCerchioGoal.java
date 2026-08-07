@@ -2,6 +2,7 @@ package io.github.orlisan.caputmundi.entities.goals;
 
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
@@ -24,6 +25,7 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
     BlockPos centroCerchio;
     double raggioDalCerchio;
     double aquilaInc;
+    boolean hasPadrone;
 
     @Override
     public void start() {
@@ -31,19 +33,22 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
         entity.isFlying = true;
         if (entity.centroCerchio != AquilaEntity.NO_CENTER) {
             centroCerchio = entity.centroCerchio;
+        } else if (entity.padrone != null) {
+            hasPadrone = true;
         } else {
             int radius = Math.random() > 0.5 ? 4 : 6;
             centroCerchio = new BlockPos(Math.random() > 0.5 ? entity.blockPosition().getX() + radius : entity.blockPosition().getX() - radius, entity.blockPosition().getY(),
                     Math.random() > 0.5 ? entity.blockPosition().getZ() + radius : entity.blockPosition().getZ() - radius);
         }
-        raggioDalCerchio = distanceTo2d(entity.position(), Vec3.atCenterOf(centroCerchio));
+        raggioDalCerchio = distanceTo2d(entity.position(), Vec3.atCenterOf(hasPadrone ? BlockPos.containing(entity.padrone.position()) : centroCerchio));
         LOGGER.info("raggio: {}, entità:{}", raggioDalCerchio, entity.getId());
         aquilaInc = findStartInc(entity.blockPosition());
     }
 
     double findStartInc(BlockPos punto) {
-        final double X = punto.getX() - centroCerchio.getX();
-        final double Z = punto.getZ() - centroCerchio.getZ();
+        BlockPos realCentroCerchio = hasPadrone ? BlockPos.containing(entity.padrone.position()) : centroCerchio;
+        final double X = punto.getX() - realCentroCerchio.getX();
+        final double Z = punto.getZ() - realCentroCerchio.getZ();
         double arcoseno = Math.asin((double) X / raggioDalCerchio) * 180 / Math.PI;
         LOGGER.info("X: {}, Z:{}, asin:{}, punto:{}, entità:{}", X, Z, arcoseno, punto, entity.getId());
         double inclinazioneFinale = 0;
@@ -64,19 +69,34 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
         return inclinazioneFinale;
     }
 
-    //TODO Scegliere centro cerchio e ruotare
+    ////TODO Scegliere centro cerchio e ruotare
+    boolean isNavigationToPadrone = false;
+
     @Override
     public void tick() {
         super.tick();
+        if (!hasPadrone && entity.padrone != null) {
+            if (isNavigationToPadrone && entity.getNavigation().isDone()) {
+                isNavigationToPadrone = false;
+                entity.changedCenter = false;
+                start();
+            } else {
+                int radius = Math.random() > 0.5 ? 10 : 15;
+                entity.getNavigation().moveTo(entity.padrone.getX() - radius, entity.padrone.position().y + 30, entity.padrone.getZ(), 1.5);
+                isNavigationToPadrone = true;
+            }
+        }
+
         if (entity.getNavigation().isDone()) {
             aquilaInc += 10;
+            BlockPos realCentroCerchio = hasPadrone ? BlockPos.containing(entity.padrone.position().with(Direction.Axis.Y, entity.padrone.position().y + 30)) : centroCerchio;
             double cos = raggioDalCerchio * Math.cos(aquilaInc * (Math.PI / 180));
-            double sin = raggioDalCerchio * Math.sin(aquilaInc * (Math.PI / 180)) + centroCerchio.getX();
-            LOGGER.info("cos:{}, sin:{}, entità:{}", cos, sin, entity.getId());
-            entity.getNavigation().moveTo(sin, centroCerchio.getY(), -cos + centroCerchio.getZ(), 1.0);
-           // LOGGER.info("entity:{}, pos:{}", entity.getId(), entity.position());
-            entity.getLookControl().setLookAt(sin, centroCerchio.getY(), -cos + centroCerchio.getZ());
-            LOGGER.info("centro:{}, inclinazione:{}, target:{}, pos:{}, entity:{}, lookControl:{}", centroCerchio, aquilaInc, new Vec3(sin, centroCerchio.getY(), -cos+centroCerchio.getZ()), entity.position(), entity.getId(), new Vec3(entity.getLookControl().getWantedX(), entity.getLookControl().getWantedY(), entity.getLookControl().getWantedZ()));
+            double sin = raggioDalCerchio * Math.sin(aquilaInc * (Math.PI / 180)) + realCentroCerchio.getX();
+            // LOGGER.info("cos:{}, sin:{}, entità:{}", cos, sin, entity.getId());
+            entity.getNavigation().moveTo(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ(), 1.0);
+            // LOGGER.info("entity:{}, pos:{}", entity.getId(), entity.position());
+            entity.getLookControl().setLookAt(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ());
+            //      LOGGER.info("centro:{}, inclinazione:{}, target:{}, pos:{}, entity:{}, lookControl:{}", realCentroCerchio, aquilaInc, new Vec3(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ()), entity.position(), entity.getId(), new Vec3(entity.getLookControl().getWantedX(), entity.getLookControl().getWantedY(), entity.getLookControl().getWantedZ()));
         }
     }
 

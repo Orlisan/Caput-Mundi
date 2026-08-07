@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "ScreenMixin",
-    "LanguageClientMixin"
+    "LanguageClientMixin",
+    "HudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
