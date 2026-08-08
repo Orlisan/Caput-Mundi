@@ -34,6 +34,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -121,41 +122,59 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public void tick() {
         super.tick();
         //CaputMundi.LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);
+        tickCounter++;
         if (!startDecollo) {
             startRuotaInCerchio();
         }
-        if (padrone != null && padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA) == null) {
-            ServerPlayNetworking.send(padrone, new AquilaVistaPacket(getAquilaVista()));
-            padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, this);
+        if (padrone != null) {
+            AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
+            if (attached == null || (attached == this && tickCounter % 20 == 0)) {
+                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(getAquilaVista()));
+                padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, this);
+            }
         }
     }
+
+    int tickCounter = 0;
 
     @Override
     protected void tickDeath() {
         super.tickDeath();
-        if(padrone != null) {
+        if (padrone != null) {
             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
             if (attached != null) {
-                if(attached == this) {
+                if (attached == this) {
                     padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);
+                    ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
                 }
             }
         }
     }
 
-    ArrayList<String> getAquilaVista() {
-        ArrayList<String> result = new ArrayList<>();
-        for (int x = (int) (this.position().x - 8); x < this.position().x + 8; x++) {
-            for (int z = (int) (this.position().z - 8); z < this.position().z + 8; z++) {
-                for (int i = (int) position().y(); i > -64; i--) {
+    ArrayList<ArrayList<String>> getAquilaVista() {
+        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        ArrayList<String> tempYList = new ArrayList<>();
+        int posX = (int) Math.floor(position().x());
+        int posY = (int) Math.floor(position().y());
+        int posZ = (int) Math.floor(position().z());
+        for (int x = posX - 8; x < posX + 8; x++) {
+            for (int z = posZ - 8; z < posZ + 8; z++) {
+                for (int i = posY; i > -64; i--) {
                     BlockPos pos = new BlockPos(x, i, z);
                     if (!level().isEmptyBlock(pos)) {
-                        result.add(BuiltInRegistries.BLOCK.getKey(level().getBlockState(pos).getBlock()).toString());
-                        break;
+                        BlockState blockState = level().getBlockState(pos);
+                        tempYList.add(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).toString());
+                        if(blockState.isCollisionShapeFullBlock(level(), pos)) {
+                            result.add(tempYList);
+                            tempYList.clear();
+                            break;
+                        }
                     }
                 }
             }
         }
+        CaputMundi.LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());
+
         return result;
     }
 
