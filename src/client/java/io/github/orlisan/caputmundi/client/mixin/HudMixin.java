@@ -33,21 +33,26 @@ import java.util.Map;
 
 import static io.github.orlisan.caputmundi.client.CaputMundiClient.vistaAquila;
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
+
 @SuppressWarnings("UnresolvedMixinReference")
 @Mixin(Hud.class)
 public class HudMixin {
     @Unique
     public Hud self = (Hud) (Object) this;
     @Unique
-    private Map<Identifier, TextureAtlasSprite> cache = new HashMap<>();
+    private final Map<Identifier, TextureAtlasSprite> cache = new HashMap<>();
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     public void renderizzaVisioneAquila(final GuiGraphicsExtractor graphics, final DeltaTracker deltaTracker, CallbackInfo ci) {
+     //   LOGGER.info("RenderizzaVisioneAquila Chiamato");
         if (!self.isHidden() && !(Minecraft.getInstance().gui.screen() instanceof LevelLoadingScreen)) {
+       //     LOGGER.info("Sono valido");
             if (!(vistaAquila == null)) {
+         //       LOGGER.info("VistaAquila non è null");
+            //   LOGGER.info("Lunghezza: {}", vistaAquila.size());
                 for (int i = 0; i < vistaAquila.size(); i++) {
                     for (Identifier id : vistaAquila.get(i)) {
-                        LOGGER.info("Blocco che sto per renderizzare: {}", id);
+                 //       LOGGER.info("Blocco che sto per renderizzare: {}", id);
                         TextureAtlasSprite sprite;
                         if (!cache.containsKey(id)) {
                             // Identifier id = vistaAquila.get(i);
@@ -86,6 +91,7 @@ public class HudMixin {
                         }
 
                         Identifier finalId = sprite.atlasLocation();
+                      //  LOGGER.info("FinalId: {}", finalId);
                         coords2d coords = trovaPos(i);
                         int size = Math.round((float) 16 / Minecraft.getInstance().getWindow().getGuiScale());
                         int x0 = coords.x() * size + 10;

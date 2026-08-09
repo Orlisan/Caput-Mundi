@@ -40,6 +40,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
+
 @SuppressWarnings("NullableProblems")
 public class AquilaEntity extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache cache =
@@ -83,19 +85,19 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public @NotNull InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
-        CaputMundi.LOGGER.info("Interact Chiamato");
+        LOGGER.info("Interact Chiamato");
         super.interact(player, hand, location);
-        CaputMundi.LOGGER.info("Dopo super, ci sono ancora");
+        LOGGER.info("Dopo super, ci sono ancora");
         if (!player.level().isClientSide()) {
             ItemStack stack = player.getItemInHand(hand);
-            CaputMundi.LOGGER.info("Item:{}, hand:{}", stack, hand);
-            CaputMundi.LOGGER.info(String.valueOf(stack.getItem() == ADDOMESTICATION_ITEM));
+            LOGGER.info("Item:{}, hand:{}", stack, hand);
+            LOGGER.info(String.valueOf(stack.getItem() == ADDOMESTICATION_ITEM));
             if (stack.getItem() == ADDOMESTICATION_ITEM) {
                 if (this.padrone == null) {
                     if (!player.isCreative())
                         player.setItemInHand(hand, new ItemStack(stack.getItem(), stack.getCount() - 1));
                     if (Math.random() < 0.3d) {
-                        //       CaputMundi.LOGGER.info("Passato random");
+                        //       LOGGER.info("Passato random");
                         this.padrone = (ServerPlayer) player;
                         this.centroCerchio = BlockPos.containing(location);
                         changedCenter = true;
@@ -103,7 +105,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         player.swing(hand);
                         return InteractionResult.SUCCESS;
                     }
-                    //     CaputMundi.LOGGER.info("Non passato random");
+                    //     LOGGER.info("Non passato random");
                 } else {
                     this.heal(Math.random() > 0.5 ? 3 : 4);
                     if (!player.isCreative())
@@ -121,7 +123,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-        //CaputMundi.LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);
+        //LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);
         tickCounter++;
         if (!startDecollo) {
             startRuotaInCerchio();
@@ -129,7 +131,9 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         if (padrone != null) {
             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
             if (attached == null || (attached == this && tickCounter % 20 == 0)) {
-                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(getAquilaVista()));
+                ArrayList<ArrayList<String>> vista = getAquilaVista();
+                //         LOGGER.info("Vista dell'aquila {}: {}", getId(), vista);
+                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(vista));
                 padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, this);
             }
         }
@@ -137,9 +141,23 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     int tickCounter = 0;
 
-    @Override
+   /* @Override
     protected void tickDeath() {
         super.tickDeath();
+        if (padrone != null) {
+            AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
+            if (attached != null) {
+                if (attached == this) {
+                    padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);
+                    ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
+                }
+            }
+        }
+    }*/
+
+    @Override
+    public void onRemoval(RemovalReason reason) {
+        super.onRemoval(reason);
         if (padrone != null) {
             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
             if (attached != null) {
@@ -164,8 +182,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                     if (!level().isEmptyBlock(pos)) {
                         BlockState blockState = level().getBlockState(pos);
                         tempYList.add(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).toString());
-                        if(blockState.isCollisionShapeFullBlock(level(), pos)) {
-                            result.add(tempYList);
+                        if (blockState.isCollisionShapeFullBlock(level(), pos)) {
+                            result.add(new ArrayList<>(tempYList));
                             tempYList.clear();
                             break;
                         }
@@ -173,7 +191,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                 }
             }
         }
-        CaputMundi.LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());
+        LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());
 
         return result;
     }

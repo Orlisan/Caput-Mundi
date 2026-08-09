@@ -31,7 +31,7 @@ public class CaputMundiClient implements ClientModInitializer {
                     List<Identifier> builder = new ArrayList<>();
                     for (String str : list) {
                         builder.add(Identifier.parse(str));
-                        LOGGER.info("Blocco:{}", Identifier.parse(str));
+                       // LOGGER.info("Blocco:{}", Identifier.parse(str));
                     }
                     Collections.reverse(builder);
                     vistaAquila.add(builder);
