@@ -4,6 +4,7 @@ import com.geckolib.GeckoLib;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
+import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;
 import net.fabricmc.api.ModInitializer;
@@ -28,6 +29,7 @@ public class CaputMundi implements ModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaPacket.TYPE, AquilaVistaPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(AquilaVistaMobsPacket.TYPE, AquilaVistaMobsPacket.CODEC);
         CaputMundiBlocks.register();
         CaputMundiItems.register();
         CaputMundiPotions.register();

@@ -1,0 +1,177 @@
+[33mcommit 23c39c5c7eaf4a0b7ee751df965c0992adff1aab[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Orlisan <sangiovanniorlando12@gmail.com>
+Date:   Sun Aug 9 22:09:04 2026 +0200
+
+    Il rendering delle aquile funziona!
+
+[1mdiff --git a/src/client/java/io/github/orlisan/caputmundi/client/CaputMundiClient.java b/src/client/java/io/github/orlisan/caputmundi/client/CaputMundiClient.java[m
+[1mindex 961c488..4537dae 100644[m
+[1m--- a/src/client/java/io/github/orlisan/caputmundi/client/CaputMundiClient.java[m
+[1m+++ b/src/client/java/io/github/orlisan/caputmundi/client/CaputMundiClient.java[m
+[36m@@ -31,7 +31,7 @@[m [mpublic class CaputMundiClient implements ClientModInitializer {[m
+                     List<Identifier> builder = new ArrayList<>();[m
+                     for (String str : list) {[m
+                         builder.add(Identifier.parse(str));[m
+[31m-                        LOGGER.info("Blocco:{}", Identifier.parse(str));[m
+[32m+[m[32m                       // LOGGER.info("Blocco:{}", Identifier.parse(str));[m
+                     }[m
+                     Collections.reverse(builder);[m
+                     vistaAquila.add(builder);[m
+[1mdiff --git a/src/client/java/io/github/orlisan/caputmundi/client/mixin/HudMixin.java b/src/client/java/io/github/orlisan/caputmundi/client/mixin/HudMixin.java[m
+[1mindex 739a9f5..c77ffb7 100644[m
+[1m--- a/src/client/java/io/github/orlisan/caputmundi/client/mixin/HudMixin.java[m
+[1m+++ b/src/client/java/io/github/orlisan/caputmundi/client/mixin/HudMixin.java[m
+[36m@@ -33,21 +33,26 @@[m [mimport java.util.Map;[m
+ [m
+ import static io.github.orlisan.caputmundi.client.CaputMundiClient.vistaAquila;[m
+ import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;[m
+[32m+[m
+ @SuppressWarnings("UnresolvedMixinReference")[m
+ @Mixin(Hud.class)[m
+ public class HudMixin {[m
+     @Unique[m
+     public Hud self = (Hud) (Object) this;[m
+     @Unique[m
+[31m-    private Map<Identifier, TextureAtlasSprite> cache = new HashMap<>();[m
+[32m+[m[32m    private final Map<Identifier, TextureAtlasSprite> cache = new HashMap<>();[m
+ [m
+     @Inject(method = "extractRenderState", at = @At("TAIL"))[m
+     public void renderizzaVisioneAquila(final GuiGraphicsExtractor graphics, final DeltaTracker deltaTracker, CallbackInfo ci) {[m
+[32m+[m[32m     //   LOGGER.info("RenderizzaVisioneAquila Chiamato");[m
+         if (!self.isHidden() && !(Minecraft.getInstance().gui.screen() instanceof LevelLoadingScreen)) {[m
+[32m+[m[32m       //     LOGGER.info("Sono valido");[m
+             if (!(vistaAquila == null)) {[m
+[32m+[m[32m         //       LOGGER.info("VistaAquila non è null");[m
+[32m+[m[32m            //   LOGGER.info("Lunghezza: {}", vistaAquila.size());[m
+                 for (int i = 0; i < vistaAquila.size(); i++) {[m
+                     for (Identifier id : vistaAquila.get(i)) {[m
+[31m-                        LOGGER.info("Blocco che sto per renderizzare: {}", id);[m
+[32m+[m[32m                 //       LOGGER.info("Blocco che sto per renderizzare: {}", id);[m
+                         TextureAtlasSprite sprite;[m
+                         if (!cache.containsKey(id)) {[m
+                             // Identifier id = vistaAquila.get(i);[m
+[36m@@ -86,6 +91,7 @@[m [mpublic class HudMixin {[m
+                         }[m
+ [m
+                         Identifier finalId = sprite.atlasLocation();[m
+[32m+[m[32m                      //  LOGGER.info("FinalId: {}", finalId);[m
+                         coords2d coords = trovaPos(i);[m
+                         int size = Math.round((float) 16 / Minecraft.getInstance().getWindow().getGuiScale());[m
+                         int x0 = coords.x() * size + 10;[m
+[1mdiff --git a/src/main/java/io/github/orlisan/caputmundi/entities/AquilaEntity.java b/src/main/java/io/github/orlisan/caputmundi/entities/AquilaEntity.java[m
+[1mindex 2cf3244..d669426 100644[m
+[1m--- a/src/main/java/io/github/orlisan/caputmundi/entities/AquilaEntity.java[m
+[1m+++ b/src/main/java/io/github/orlisan/caputmundi/entities/AquilaEntity.java[m
+[36m@@ -40,6 +40,8 @@[m [mimport org.jetbrains.annotations.NotNull;[m
+ [m
+ import java.util.ArrayList;[m
+ [m
+[32m+[m[32mimport static io.github.orlisan.caputmundi.CaputMundi.LOGGER;[m
+[32m+[m
+ @SuppressWarnings("NullableProblems")[m
+ public class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+     private final AnimatableInstanceCache cache =[m
+[36m@@ -83,19 +85,19 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+ [m
+     @Override[m
+     public @NotNull InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {[m
+[31m-        CaputMundi.LOGGER.info("Interact Chiamato");[m
+[32m+[m[32m        LOGGER.info("Interact Chiamato");[m
+         super.interact(player, hand, location);[m
+[31m-        CaputMundi.LOGGER.info("Dopo super, ci sono ancora");[m
+[32m+[m[32m        LOGGER.info("Dopo super, ci sono ancora");[m
+         if (!player.level().isClientSide()) {[m
+             ItemStack stack = player.getItemInHand(hand);[m
+[31m-            CaputMundi.LOGGER.info("Item:{}, hand:{}", stack, hand);[m
+[31m-            CaputMundi.LOGGER.info(String.valueOf(stack.getItem() == ADDOMESTICATION_ITEM));[m
+[32m+[m[32m            LOGGER.info("Item:{}, hand:{}", stack, hand);[m
+[32m+[m[32m            LOGGER.info(String.valueOf(stack.getItem() == ADDOMESTICATION_ITEM));[m
+             if (stack.getItem() == ADDOMESTICATION_ITEM) {[m
+                 if (this.padrone == null) {[m
+                     if (!player.isCreative())[m
+                         player.setItemInHand(hand, new ItemStack(stack.getItem(), stack.getCount() - 1));[m
+                     if (Math.random() < 0.3d) {[m
+[31m-                        //       CaputMundi.LOGGER.info("Passato random");[m
+[32m+[m[32m                        //       LOGGER.info("Passato random");[m
+                         this.padrone = (ServerPlayer) player;[m
+                         this.centroCerchio = BlockPos.containing(location);[m
+                         changedCenter = true;[m
+[36m@@ -103,7 +105,7 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+                         player.swing(hand);[m
+                         return InteractionResult.SUCCESS;[m
+                     }[m
+[31m-                    //     CaputMundi.LOGGER.info("Non passato random");[m
+[32m+[m[32m                    //     LOGGER.info("Non passato random");[m
+                 } else {[m
+                     this.heal(Math.random() > 0.5 ? 3 : 4);[m
+                     if (!player.isCreative())[m
+[36m@@ -121,7 +123,7 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+     @Override[m
+     public void tick() {[m
+         super.tick();[m
+[31m-        //CaputMundi.LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);[m
+[32m+[m[32m        //LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);[m
+         tickCounter++;[m
+         if (!startDecollo) {[m
+             startRuotaInCerchio();[m
+[36m@@ -129,7 +131,9 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+         if (padrone != null) {[m
+             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);[m
+             if (attached == null || (attached == this && tickCounter % 20 == 0)) {[m
+[31m-                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(getAquilaVista()));[m
+[32m+[m[32m                ArrayList<ArrayList<String>> vista = getAquilaVista();[m
+[32m+[m[32m                //         LOGGER.info("Vista dell'aquila {}: {}", getId(), vista);[m
+[32m+[m[32m                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(vista));[m
+                 padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, this);[m
+             }[m
+         }[m
+[36m@@ -137,7 +141,7 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+ [m
+     int tickCounter = 0;[m
+ [m
+[31m-    @Override[m
+[32m+[m[32m   /* @Override[m
+     protected void tickDeath() {[m
+         super.tickDeath();[m
+         if (padrone != null) {[m
+[36m@@ -149,6 +153,20 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+                 }[m
+             }[m
+         }[m
+[32m+[m[32m    }*/[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onRemoval(RemovalReason reason) {[m
+[32m+[m[32m        super.onRemoval(reason);[m
+[32m+[m[32m        if (padrone != null) {[m
+[32m+[m[32m            AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);[m
+[32m+[m[32m            if (attached != null) {[m
+[32m+[m[32m                if (attached == this) {[m
+[32m+[m[32m                    padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);[m
+[32m+[m[32m                    ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));[m
+[32m+[m[32m                }[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     ArrayList<ArrayList<String>> getAquilaVista() {[m
+[36m@@ -164,8 +182,8 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+                     if (!level().isEmptyBlock(pos)) {[m
+                         BlockState blockState = level().getBlockState(pos);[m
+                         tempYList.add(BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).toString());[m
+[31m-                        if(blockState.isCollisionShapeFullBlock(level(), pos)) {[m
+[31m-                            result.add(tempYList);[m
+[32m+[m[32m                        if (blockState.isCollisionShapeFullBlock(level(), pos)) {[m
+[32m+[m[32m                            result.add(new ArrayList<>(tempYList));[m
+                             tempYList.clear();[m
+                             break;[m
+                         }[m
+[36m@@ -173,7 +191,7 @@[m [mpublic class AquilaEntity extends PathfinderMob implements GeoEntity {[m
+                 }[m
+             }[m
+         }[m
+[31m-        CaputMundi.LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());[m
+[32m+[m[32m        LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());[m
+ [m
+         return result;[m
+     }[m

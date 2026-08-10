@@ -1,6 +1,7 @@
 package io.github.orlisan.caputmundi.packets;
 
 import io.github.orlisan.caputmundi.CaputMundi;
+import io.github.orlisan.caputmundi.CaputMundiConstants;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,8 +26,9 @@ public record AquilaVistaPacket(ArrayList<ArrayList<String>> blockIds) implement
     }*/
 
     public static final Type<AquilaVistaPacket> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila_vista_packet"));
+
     static StreamCodec<FriendlyByteBuf, ArrayList<String>> CODEC2 =
-            ByteBufCodecs.collection(java.util.ArrayList::new, ByteBufCodecs.stringUtf8(32767));
+            ByteBufCodecs.collection(java.util.ArrayList::new, ByteBufCodecs.stringUtf8(CaputMundiConstants.PACKET_STRING_MAX_LENGTH));
     public static final StreamCodec<FriendlyByteBuf, AquilaVistaPacket> CODEC =
             ByteBufCodecs.collection(java.util.ArrayList::new, CODEC2).map(
                     AquilaVistaPacket::new,

@@ -31,10 +31,12 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
     public void start() {
         super.start();
         entity.isFlying = true;
+        if (entity.padrone != null) {
+            hasPadrone = true;
+        }
         if (entity.centroCerchio != AquilaEntity.NO_CENTER) {
             centroCerchio = entity.centroCerchio;
-        } else if (entity.padrone != null) {
-            hasPadrone = true;
+
         } else {
             int radius = Math.random() > 0.5 ? 4 : 6;
             centroCerchio = new BlockPos(Math.random() > 0.5 ? entity.blockPosition().getX() + radius : entity.blockPosition().getX() - radius, entity.blockPosition().getY(),
@@ -69,7 +71,6 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
         return inclinazioneFinale;
     }
 
-    ////TODO Scegliere centro cerchio e ruotare
     boolean isNavigationToPadrone = false;
 
     @Override

@@ -1,7 +1,9 @@
 package io.github.orlisan.caputmundi.client;
 
+import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
+import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -19,7 +21,11 @@ public class CaputMundiClient implements ClientModInitializer {
     StringBuilder vecchioSelected = new StringBuilder();
     public static boolean eraHardcore = false;
     public static List<List<Identifier>> vistaAquila = new ArrayList<>();
+    public static List<String> mobs;
+    public static List<Double> xMobs;
+    public static List<Double> yMobs;
     boolean giaSettataVista = false;
+    public static final Identifier ZOMBIE_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_zombie_sprite.png");
 
     @Override
     public void onInitializeClient() {
@@ -31,13 +37,21 @@ public class CaputMundiClient implements ClientModInitializer {
                     List<Identifier> builder = new ArrayList<>();
                     for (String str : list) {
                         builder.add(Identifier.parse(str));
-                       // LOGGER.info("Blocco:{}", Identifier.parse(str));
+                        // LOGGER.info("Blocco:{}", Identifier.parse(str));
                     }
                     Collections.reverse(builder);
                     vistaAquila.add(builder);
                 }
+          //      LOGGER.info("VistaAquilaRicevuta:{}", vistaAquila);
                 //    giaSettataVista = true;
                 // }
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AquilaVistaMobsPacket.TYPE, (packet, context) -> {
+            context.client().execute(() -> {
+                mobs = packet.names();
+                xMobs = packet.xs();
+                yMobs = packet.ys();
             });
         });
         EntityRenderers.register(

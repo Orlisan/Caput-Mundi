@@ -1,5 +1,8 @@
 package io.github.orlisan.caputmundi.client.mixin;
 
+import io.github.orlisan.caputmundi.CaputMundi;
+import io.github.orlisan.caputmundi.client.CaputMundiClient;
+import io.github.orlisan.caputmundi.client.CaputMundiClient.coords2d;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -23,61 +26,55 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import io.github.orlisan.caputmundi.client.CaputMundiClient.coords2d;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.github.orlisan.caputmundi.client.CaputMundiClient.vistaAquila;
-import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
+import static io.github.orlisan.caputmundi.client.CaputMundiClient.mobs;
+import static io.github.orlisan.caputmundi.client.CaputMundiClient.xMobs;
+import static io.github.orlisan.caputmundi.client.CaputMundiClient.yMobs;
 
 @SuppressWarnings("UnresolvedMixinReference")
 @Mixin(Hud.class)
 public class HudMixin {
     @Unique
-    public Hud self = (Hud) (Object) this;
-    @Unique
     private final Map<Identifier, TextureAtlasSprite> cache = new HashMap<>();
+    //   @Unique
+    //   private  final Identifier AQUILA_MOBS_ATLAS = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_mobs_atlas.png");
+    @Unique
+    private final Map<String, Identifier> paths = Map.of(
+            "minecraft:zombie", CaputMundiClient.ZOMBIE_SPRITE
+    );
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     public void renderizzaVisioneAquila(final GuiGraphicsExtractor graphics, final DeltaTracker deltaTracker, CallbackInfo ci) {
-     //   LOGGER.info("RenderizzaVisioneAquila Chiamato");
-        if (!self.isHidden() && !(Minecraft.getInstance().gui.screen() instanceof LevelLoadingScreen)) {
-       //     LOGGER.info("Sono valido");
+        //   LOGGER.info("RenderizzaVisioneAquila Chiamato");
+        Hud self = (Hud) (Object) this;
+        // CaputMundi.LOGGER.error("PERCHÈ: {} {} {}", self, cache, paths);
+        if (self != null && !self.isHidden() && !(Minecraft.getInstance().gui.screen() instanceof LevelLoadingScreen)) {
+            //     LOGGER.info("Sono valido");
+            CaputMundi.LOGGER.info("Mixin Chiamato");
             if (!(vistaAquila == null)) {
-         //       LOGGER.info("VistaAquila non è null");
-            //   LOGGER.info("Lunghezza: {}", vistaAquila.size());
                 for (int i = 0; i < vistaAquila.size(); i++) {
                     for (Identifier id : vistaAquila.get(i)) {
-                 //       LOGGER.info("Blocco che sto per renderizzare: {}", id);
                         TextureAtlasSprite sprite;
                         if (!cache.containsKey(id)) {
-                            // Identifier id = vistaAquila.get(i);
                             BlockState state = BuiltInRegistries.BLOCK.get(id).map(Holder.Reference::value).orElse(Blocks.AIR).defaultBlockState();
                             BlockStateModelSet set = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
                             BlockStateModel model = set.get(state);
                             List<BlockStateModelPart> parts = new ArrayList<>();
                             model.collectParts(RandomSource.create(state.getSeed(BlockPos.ZERO)), parts);
                             TextureAtlasSprite sprite1 = null;
-                 /*   float U0;
-                    float U1;
-                    float V0;
-                    float V1;*/
+
                             for (BlockStateModelPart part : parts) {
                                 List<BakedQuad> quads = part.getQuads(Direction.UP);
                                 if (!quads.isEmpty()) {
                                     BakedQuad first = quads.getFirst();
                                     sprite1 = first.materialInfo().sprite();
-                   /*        long packetUv0 = first.packedUV0();
-                           U0 = UVPair.unpackU(packetUv0);
-                            V0 = UVPair.unpackV(packetUv0);
 
-                            long packetUv1 = first.packedUV1();
-                            U1 = UVPair.unpackU(packetUv1);
-                            V1 = UVPair.unpackV(packetUv1);*/
                                     break;
                                 }
                             }
@@ -91,26 +88,41 @@ public class HudMixin {
                         }
 
                         Identifier finalId = sprite.atlasLocation();
-                      //  LOGGER.info("FinalId: {}", finalId);
                         coords2d coords = trovaPos(i);
                         int size = Math.round((float) 16 / Minecraft.getInstance().getWindow().getGuiScale());
                         int x0 = coords.x() * size + 10;
                         int y0 = coords.y() * size + 10;
                         int x1 = x0 + size;
                         int y1 = y0 + size;
-                     /*  BlockState state = Minecraft.getInstance().level.getBlockState(new BlockPos(1, 1, 1));
-                        Minecraft.getInstance().getBlockColors().getT*/
+                        CaputMundi.LOGGER.info("U0:{}, U1:{}, V0: {}, V1:{}", sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
                         graphics.blit(finalId, x0, y0, x1, y1, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1());
                     }
                 }
             }
+            if (mobs != null && xMobs != null && yMobs != null &&
+                !mobs.isEmpty() && !xMobs.isEmpty() && !yMobs.isEmpty()) {
+                for (int i = 0; i < mobs.size(); i++) {
+                    String mobName = mobs.get(i);
+                    int size = Math.round((float) 8 / Minecraft.getInstance().getWindow().getGuiScale());
+                    double x0 = xMobs.get(i) * size + 10;
+                    double y0 = yMobs.get(i) * size + 10;
+                    double x1 = x0 + size;
+                    double y1 = y0 + size;
+                    Identifier location = paths.get(mobName);
+                    if (location != null) {
+                        graphics.blit(location, (int) x0, (int) y0, (int) x1, (int) y1, 0.0f, 0.0f, 1.0f, 1.0f);
+                    }
+                }
+            }
+
         }
+
     }
 
     /**
      * Commento testimone del mio modo per prendere da solo le uv
      */
-    // record uv(float u, float v) {}
+// record uv(float u, float v) {}
   /*  uv convertToBinary(long start) {
         List<Byte> result = new ArrayList<>();
         while(start > 0) {
@@ -129,5 +141,7 @@ public class HudMixin {
     private coords2d trovaPos(int index) {
         return new coords2d(index % texture_size, (index - index % texture_size) / texture_size);
     }
+
+
 }
 

@@ -14,4 +14,5 @@ public final class CaputMundiConstants {
             });
     public static final AttachmentType<AquilaEntity> AQUILA_VISUALIZZATA =
             AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila_visualizzata"));
+    public static final int PACKET_STRING_MAX_LENGTH = 32767;
 }

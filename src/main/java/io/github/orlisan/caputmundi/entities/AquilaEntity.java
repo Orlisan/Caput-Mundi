@@ -11,6 +11,7 @@ import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.CaputMundiConstants;
 import io.github.orlisan.caputmundi.entities.goals.DecolloGoal;
 import io.github.orlisan.caputmundi.entities.goals.RuotaInCerchioGoal;
+import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
@@ -18,9 +19,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -29,16 +32,22 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
@@ -103,6 +112,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         changedCenter = true;
                         this.setHasCollar(true);
                         player.swing(hand);
+                        this.setPersistenceRequired();
                         return InteractionResult.SUCCESS;
                     }
                     //     LOGGER.info("Non passato random");
@@ -132,8 +142,18 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
             if (attached == null || (attached == this && tickCounter % 20 == 0)) {
                 ArrayList<ArrayList<String>> vista = getAquilaVista();
+                Map<String, coordsMob> vistaMobs = getMobs();
+                List<String> mobs = vistaMobs.keySet().stream().toList();
+                Collection<coordsMob> coords = vistaMobs.values();
+                List<Double> x = new ArrayList<>();
+                List<Double> y = new ArrayList<>();
+                for (coordsMob c : coords) {
+                    x.add(c.x);
+                    y.add(c.y);
+                }
                 //         LOGGER.info("Vista dell'aquila {}: {}", getId(), vista);
                 ServerPlayNetworking.send(padrone, new AquilaVistaPacket(vista));
+                ServerPlayNetworking.send(padrone, new AquilaVistaMobsPacket(mobs, x, y));
                 padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, this);
             }
         }
@@ -141,19 +161,61 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     int tickCounter = 0;
 
-   /* @Override
-    protected void tickDeath() {
-        super.tickDeath();
-        if (padrone != null) {
-            AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
-            if (attached != null) {
-                if (attached == this) {
-                    padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);
-                    ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
+    /* @Override
+     protected void tickDeath() {
+         super.tickDeath();
+         if (padrone != null) {
+             AquilaEntity attached = padrone.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA);
+             if (attached != null) {
+                 if (attached == this) {
+                     padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);
+                     ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
+                 }
+             }
+         }
+     }*/
+    record coordsMob(double x, double y) {
+    }
+
+    public Map<String, coordsMob> getMobs() {
+        int posX = (int) Math.floor(position().x());
+        int posY = (int) Math.floor(position().y());
+        int posZ = (int) Math.floor(position().z());
+        int minY = Integer.MAX_VALUE;
+        for (int x = posX - 8; x < posX + 8; x++) {
+            for (int z = posZ - 8; z < posZ + 8; z++) {
+                for (int i = posY; i > -64; i--) {
+                    BlockPos pos = new BlockPos(x, i, z);
+                    if (!level().isEmptyBlock(pos)) {
+                        if (i < minY) minY = i;
+                        break;
+                    }
                 }
             }
         }
-    }*/
+        AABB aabb = new AABB(position().x - 8, minY, position().z - 8, position().x + 8, position().y, position().z() + 8);
+        Map<String, coordsMob> result = new HashMap<>();
+        for (Entity entity : level().getEntitiesOfClass(Zombie.class, aabb)) {
+            result.put("minecraft:zombie", findCoords(aabb, entity.position()));
+        }
+       /* for (Entity entity : level().getEntitiesOfClass(Creeper.class, aabb)) {
+            result.put("minecraft:creeper", findCoords(aabb, entity.position()));
+        }
+        for (Entity entity : level().getEntitiesOfClass(Skeleton.class, aabb)) {
+            result.put("minecraft:skeleton", findCoords(aabb, entity.position()));
+        }
+        for (Entity entity : level().getEntitiesOfClass(Spider.class, aabb)) {
+            result.put("minecraft:spider", findCoords(aabb, entity.position()));
+        }
+        for (Entity entity : level().getEntitiesOfClass(CaveSpider.class, aabb)) {
+            result.put("minecraft:cave_spider", findCoords(aabb, entity.position()));
+        }*/
+        return result;
+    }
+
+    coordsMob findCoords(AABB aabb, Vec3 position) {
+        return new coordsMob(position.x - aabb.minX, aabb.maxZ - position.z());
+    }
 
     @Override
     public void onRemoval(RemovalReason reason) {
@@ -191,7 +253,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                 }
             }
         }
-        LOGGER.info("Size:{}, Aquila:{}", result.size(), this.getId());
+        // LOGGER.info("Size:{}, Aquila:{}, Result:{}", result.size(), this.getId(), result);
 
         return result;
     }

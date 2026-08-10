@@ -1,5 +1,6 @@
 package io.github.orlisan.caputmundi.client.mixin;
 
+import io.netty.util.internal.SuppressJava8Requirement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
