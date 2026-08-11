@@ -26,6 +26,8 @@ public class CaputMundiClient implements ClientModInitializer {
     public static List<Double> yMobs;
     boolean giaSettataVista = false;
     public static final Identifier ZOMBIE_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_zombie_sprite.png");
+    public static final Identifier CREEPER_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_creeper_sprite.png");
+    public static final Identifier ENDERMAN_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_enderman_sprite.png");
 
     @Override
     public void onInitializeClient() {
@@ -42,7 +44,8 @@ public class CaputMundiClient implements ClientModInitializer {
                     Collections.reverse(builder);
                     vistaAquila.add(builder);
                 }
-          //      LOGGER.info("VistaAquilaRicevuta:{}", vistaAquila);
+                // Collections.reverse(vistaAquila);
+                //      LOGGER.info("VistaAquilaRicevuta:{}", vistaAquila);
                 //    giaSettataVista = true;
                 // }
             });

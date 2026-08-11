@@ -3,9 +3,10 @@
   "package": "io.github.orlisan.caputmundi.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "ScreenMixin",
+    "HudMixin",
     "LanguageClientMixin",
-    "HudMixin"
+    "ScreenMixin",
+    "SplashManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

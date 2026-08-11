@@ -8,6 +8,7 @@ import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 import net.minecraft.resources.Identifier;
@@ -30,6 +31,7 @@ public class CaputMundi implements ModInitializer {
         // Proceed with mild caution.
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaPacket.TYPE, AquilaVistaPacket.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaMobsPacket.TYPE, AquilaVistaMobsPacket.CODEC);
+        CaputMundiConstants.register();
         CaputMundiBlocks.register();
         CaputMundiItems.register();
         CaputMundiPotions.register();

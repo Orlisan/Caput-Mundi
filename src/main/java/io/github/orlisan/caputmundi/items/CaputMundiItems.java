@@ -49,7 +49,7 @@ public class CaputMundiItems {
         LAURUS_LEAF = registerItem("laurus_leaves");
         LAURUS_SEED = registerBlockItem("laurus_seed", CaputMundiBlocks.LAURUS_CROP);
         LAURUS_CROWN = registerItem("laurus_crown", LaurusCrownItem::new, new Item.Properties().durability(360).equippable(EquipmentSlot.HEAD));
-        GOLDEN_LAURUS_CROWN = registerItem("golden_laurus_crown", LaurusCrownItem::new, new Item.Properties().durability(720).equippable(EquipmentSlot.HEAD));
+        //  GOLDEN_LAURUS_CROWN = registerItem("golden_laurus_crown", LaurusCrownItem::new, new Item.Properties().durability(720).equippable(EquipmentSlot.HEAD));
         IMPERIAL_GOLD_INGOT = registerItem("imperial_gold_ingot");
     }
 }
