@@ -28,6 +28,9 @@ public class CaputMundiClient implements ClientModInitializer {
     public static final Identifier ZOMBIE_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_zombie_sprite.png");
     public static final Identifier CREEPER_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_creeper_sprite.png");
     public static final Identifier ENDERMAN_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_enderman_sprite.png");
+    public static final Identifier SPIDER_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_spider_sprite.png");
+    public static final Identifier CAVE_SPIDER_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_cave_spider_sprite.png");
+    public static final Identifier SKELETON_SPRITE = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/gui/aquila_skeleton_sprite.png");
 
     @Override
     public void onInitializeClient() {

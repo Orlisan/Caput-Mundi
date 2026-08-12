@@ -8,6 +8,8 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import io.github.orlisan.caputmundi.CaputMundiConstants;
+import io.github.orlisan.caputmundi.entities.goals.AttaccoDistanzaGoal;
+import io.github.orlisan.caputmundi.entities.goals.AttaccoRavvicinatoGoal;
 import io.github.orlisan.caputmundi.entities.goals.DecolloGoal;
 import io.github.orlisan.caputmundi.entities.goals.RuotaInCerchioGoal;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -20,12 +22,12 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -33,6 +35,9 @@ import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -60,8 +65,42 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public boolean startAnimCerchio = false;
     public boolean changedCenter = false;
     public BlockPos centroCerchio = NO_CENTER;
+
+    public boolean distanceAttack = false;
+    private boolean startAnimDistanceAttack = false;
+    public boolean vicinoAttack = false;
+    //public LivingEntity attacked = null;
     private static final EntityDataAccessor<Boolean> HAS_COLLAR =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Override
+    protected void actuallyHurt(ServerLevel level, DamageSource source, float dmg) {
+        if (source.is(DamageTypes.FALL)) return;
+        Entity entity = source.getEntity();
+        if (/*source.is(DamageTypes.MOB_ATTACK) &&*/ entity instanceof Mob livingEntity) {
+            if (this.distanceTo(entity) < 3.0f) {
+                vicinoAttack = true;
+            } else {
+                startAttaccoADistanza();
+            }
+            setTarget(livingEntity);
+        } else if (/*(source.is(DamageTypes.PLAYER_ATTACK) && source.is(DamageTypes.ARROW)) && */entity instanceof ServerPlayer player) {
+            if (player == padrone && RandomSource.create().nextDouble() > 0.9) {
+                padrone.setAttached(CaputMundiConstants.AQUILA_VISUALIZZATA, null);
+                ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
+                ServerPlayNetworking.send(padrone, new AquilaVistaMobsPacket(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                setHasCollar(false);
+                padrone = null;
+            }
+            if (this.distanceTo(entity) < 3.0f) {
+                vicinoAttack = true;
+            } else {
+                startAttaccoADistanza();
+            }
+            setTarget(player);
+        }
+        super.actuallyHurt(level, source, dmg);
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder entityData) {
@@ -77,7 +116,6 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         this.entityData.set(HAS_COLLAR, newCollar);
     }
 
-    //TODO:Mettere addomesticamento e coso client mixin a Hud.class
     public ServerPlayer padrone = null;
     public static final double DURATA_VOLO = 2.5;
 
@@ -124,7 +162,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 5.0f).add(Attributes.MAX_HEALTH, 30.0F);
+        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 5.0f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 1.0);
     }
 
     @Override
@@ -211,15 +249,18 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             result.put("minecraft:enderman" + mobsCount, findCoords(aabb, entity.position()));
             mobsCount++;
         }
-     /*   for (Entity entity : level().getEntitiesOfClass(Skeleton.class, aabb)) {
-            result.put("minecraft:skeleton", findCoords(aabb, entity.position()));
+        for (Entity entity : level().getEntitiesOfClass(Skeleton.class, aabb)) {
+            result.put("minecraft:skeleton" + mobsCount, findCoords(aabb, entity.position()));
+            mobsCount++;
         }
         for (Entity entity : level().getEntitiesOfClass(Spider.class, aabb)) {
-            result.put("minecraft:spider", findCoords(aabb, entity.position()));
+            result.put("minecraft:spider" + mobsCount, findCoords(aabb, entity.position()));
+            mobsCount++;
         }
         for (Entity entity : level().getEntitiesOfClass(CaveSpider.class, aabb)) {
-            result.put("minecraft:cave_spider", findCoords(aabb, entity.position()));
-        }*/
+            result.put("minecraft:cave_spider" + mobsCount, findCoords(aabb, entity.position()));
+            mobsCount++;
+        }
         return result;
     }
 
@@ -269,12 +310,18 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         return result;
     }
 
-    void startRuotaInCerchio() {
+    public void startRuotaInCerchio() {
         this.ruotaInCerchio = true;
         this.startAnimCerchio = true;
     }
 
-    void startDecollo() {
+    public void startAttaccoADistanza() {
+        this.distanceAttack = true;
+        this.startAnimDistanceAttack = true;
+    }
+
+
+    public void startDecollo() {
         this.startDecollo = true;
         this.startAnimDecollo = true;
     }
@@ -295,15 +342,16 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         RawAnimation.begin()
                                 .thenPlay("animazione_decollo").thenLoop("animazione_volo"));
                 startAnimDecollo = false;
-            } else if (startAnimCerchio) {
-                if (state.controller().getCurrentAnimationTime() % DURATA_VOLO < 0.1) {
-                    state.setAnimation(
-                            RawAnimation.begin()
-                                    .thenPlay("animazione_trans_inclinazione")
-                                    .thenLoop("animazione_volo_inclinato")
-                    );
-                    startAnimCerchio = false;
-                }
+            } else if (startAnimCerchio && state.controller().getCurrentAnimationTime() % DURATA_VOLO < 0.1) {
+                state.setAnimation(
+                        RawAnimation.begin()
+                                .thenPlay("animazione_trans_inclinazione")
+                                .thenLoop("animazione_volo_inclinato")
+                );
+                startAnimCerchio = false;
+            } else if (startAnimDistanceAttack) {
+                state.setAnimation(RawAnimation.begin().thenPlayAndHold("animazione_atterraggio"));
+                startAnimDistanceAttack = false;
             }
             return PlayState.CONTINUE;
         }));
@@ -317,8 +365,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     protected void registerGoals() {
         //this.goalSelector.addGoal();
-        this.goalSelector.addGoal(0, new DecolloGoal(this));
-        this.goalSelector.addGoal(1, new RuotaInCerchioGoal(this));
+
+        this.goalSelector.addGoal(0, new AttaccoRavvicinatoGoal(this, 3.5, false));
+        this.goalSelector.addGoal(1, new AttaccoDistanzaGoal(this));
+        this.goalSelector.addGoal(2, new DecolloGoal(this));
+        this.goalSelector.addGoal(3, new RuotaInCerchioGoal(this));
         super.registerGoals();
     }
 

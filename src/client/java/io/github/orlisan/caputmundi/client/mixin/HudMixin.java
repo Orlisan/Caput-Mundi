@@ -47,8 +47,11 @@ public class HudMixin {
     @Unique
     private final Map<String, Identifier> paths = Map.of(
             "minecraft:zombie", CaputMundiClient.ZOMBIE_SPRITE,
-            "minecraft:creeper", CaputMundiClient.CREEPER_SPRITE,
-            "minecraft:enderman", CaputMundiClient.ENDERMAN_SPRITE
+            "minecraft:creepe", CaputMundiClient.CREEPER_SPRITE,
+            "minecraft:enderm", CaputMundiClient.ENDERMAN_SPRITE,
+            "minecraft:spider", CaputMundiClient.SPIDER_SPRITE,
+            "minecraft:cave_s", CaputMundiClient.CAVE_SPIDER_SPRITE,
+            "minecraft:skelet", CaputMundiClient.SKELETON_SPRITE
     );
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
