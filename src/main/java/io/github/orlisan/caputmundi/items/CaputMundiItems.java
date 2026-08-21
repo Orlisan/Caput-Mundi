@@ -20,7 +20,7 @@ public class CaputMundiItems {
     public static Item LAURUS_LEAF, LAURUS_SEED;
     public static Item LAURUS_CROWN, GOLDEN_LAURUS_CROWN;
     public static Item IMPERIAL_GOLD_INGOT;
-    public static Item AQUILA_SPAWN_EGG_ITEM;
+    public static Item AQUILA_SPAWN_EGG_ITEM, AQUILA_ARMOR_ITEM, LITUUS_ITEM;
 
     private static Item registerItem(String id) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, id);
@@ -53,7 +53,9 @@ public class CaputMundiItems {
         LAURUS_SEED = registerBlockItem("laurus_seed", CaputMundiBlocks.LAURUS_CROP);
         LAURUS_CROWN = registerItem("laurus_crown", LaurusCrownItem::new, new Item.Properties().durability(360).equippable(EquipmentSlot.HEAD));
         //  GOLDEN_LAURUS_CROWN = registerItem("golden_laurus_crown", LaurusCrownItem::new, new Item.Properties().durability(720).equippable(EquipmentSlot.HEAD));
+        LITUUS_ITEM = registerItem("lituus_item", LituusItem::new, new Item.Properties());
         IMPERIAL_GOLD_INGOT = registerItem("imperial_gold_ingot");
+        AQUILA_ARMOR_ITEM = registerItem("aquila_armor");
         AQUILA_SPAWN_EGG_ITEM = registerItem("aquila_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(CaputMundiEntities.AQUILA));
     }
 }

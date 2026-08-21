@@ -1,4 +1,4 @@
-package io.github.orlisan.caputmundi.mixin;
+/*package io.github.orlisan.caputmundi.mixin;
 
 import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
@@ -17,7 +17,7 @@ public class PlayerHurtMixin {
     @Unique
     LivingEntity self = (Player) (Object) this;
 
-    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"),/* argsOnly = true,*/ ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"),/* argsOnly = true,*/ /*ordinal = 0, argsOnly = true)
     private float detraeDannoCorona(float dmg) {
         CaputMundi.LOGGER.info("ActuallyHurt chiamato da player, self: " + self.toString());
         ItemStack itemBySlot = self.getItemBySlot(EquipmentSlot.HEAD);
@@ -32,3 +32,4 @@ public class PlayerHurtMixin {
         return dmg;
     }
 }
+*/

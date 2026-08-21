@@ -14,15 +14,6 @@ public class LaurusCrownItem extends Item {
         super(properties);
     }
 
-   /* @Override
-    public @NotNull InteractionResult use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
-        super.use(level, player, hand);
-        ItemStack vecchioHead = player.getItemBySlot(EquipmentSlot.HEAD);
-        player.setItemSlot(EquipmentSlot.HEAD, player.getItemInHand(hand));
-        player.setItemInHand(hand, vecchioHead);
-        return InteractionResult.SUCCESS;
-    }*/
-
     @Override
     public int getDefaultMaxStackSize() {
         return 1;

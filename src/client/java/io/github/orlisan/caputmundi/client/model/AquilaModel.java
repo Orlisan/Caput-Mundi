@@ -27,6 +27,7 @@ public class AquilaModel extends GeoModel<@NotNull AquilaEntity> {
     @Override
     public void addAdditionalStateData(@NotNull AquilaEntity animatable, @Nullable Object relatedObject, GeoRenderState renderState) {
         renderState.addGeckolibData(CaputMundiConstants.HAS_COLLAR, animatable.hasCollar());
+        renderState.addGeckolibData(CaputMundiConstants.HAS_ARMOR, animatable.hasArmor());
         super.addAdditionalStateData(animatable, relatedObject, renderState);
     }
 

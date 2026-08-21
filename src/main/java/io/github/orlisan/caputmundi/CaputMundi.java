@@ -8,6 +8,7 @@ import io.github.orlisan.caputmundi.items.CaputMundiCreativeTab;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
+import io.github.orlisan.caputmundi.packets.LituusInitialPacket;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -76,6 +77,7 @@ public class CaputMundi implements ModInitializer {
         }));
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaPacket.TYPE, AquilaVistaPacket.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaMobsPacket.TYPE, AquilaVistaMobsPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(LituusInitialPacket.TYPE, LituusInitialPacket.CODEC);
         CaputMundiConstants.register();
         CaputMundiBlocks.register();
         CaputMundiItems.register();

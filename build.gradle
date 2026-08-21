@@ -1,6 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 version = project.mod_version
@@ -11,6 +12,7 @@ repositories {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
     }
+    mavenCentral()
 }
 
 loom {
@@ -31,6 +33,7 @@ dependencies {
     implementation "maven.modrinth:geckolib:L6bn4TS8"
     // Fabric API. This is technically optional, but you probably want it anyway.
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 processResources {
@@ -52,8 +55,6 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -80,4 +81,7 @@ publishing {
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
     }
+}
+kotlin {
+    jvmToolchain(25)
 }

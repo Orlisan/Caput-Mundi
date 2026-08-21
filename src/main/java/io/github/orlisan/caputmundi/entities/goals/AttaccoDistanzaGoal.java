@@ -1,5 +1,6 @@
 package io.github.orlisan.caputmundi.entities.goals;
 
+import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +31,8 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
             if (entity.distanceTo(entity.getTarget()) < 3.0f) {
                 entity.distanceAttack = false;
             }
+            entity.getNavigation().stop();
+            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(entity.getTarget(), 5.0);
             entity.setAggressive(true);
         } else {
@@ -40,6 +43,8 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
             for (LivingEntity mob : entity.level().getEntitiesOfClass(Animal.class, aabb)) {
                 if (random.nextDouble() > 0.3) {
                     entity.setTarget(mob);
+                    entity.getNavigation().stop();
+                    CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
                     entity.getNavigation().moveTo(entity.getTarget(), 5.0);
                     entity.getLookControl().setLookAt(entity.getTarget());
                     entity.setAggressive(true);
@@ -60,6 +65,8 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
             entity.distanceAttack = false;
             entity.vicinoAttack = true;
         } else if (entity.getTarget() != null) {
+            entity.getNavigation().stop();
+            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(entity.getTarget(), 5.0);
             entity.getLookControl().setLookAt(entity.getTarget());
         }

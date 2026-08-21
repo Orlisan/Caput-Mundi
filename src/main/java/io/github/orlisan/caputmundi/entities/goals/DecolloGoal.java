@@ -47,9 +47,11 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
     @Override
     public void start() {
         targetPos = findGoodStartPlace(Objects.requireNonNullElse(entity.padrone, entity).getOnPos());
-        CaputMundi.LOGGER.info("Target pos: {}", targetPos);
+        CaputMundi.LOGGER.info("Start Decollo Chiamato!: Target pos: {}, Position:{}, entity:{}", targetPos, entity.position(), entity.getId());
         if (targetPos != failPos) {
             entity.isFlying = true;
+            entity.getNavigation().stop();
+            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(targetPos.getX(), targetPos.getY(), targetPos.getZ(), 1.0);
             entity.getLookControl().setLookAt(Vec3.atLowerCornerOf(targetPos));
         } else {
@@ -76,6 +78,7 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
 
     @Override
     public void stop() {
+        CaputMundi.LOGGER.info("DecolloGoal finito, entity:{}", entity.getId());
         entity.startDecollo = false;
         super.stop();
     }

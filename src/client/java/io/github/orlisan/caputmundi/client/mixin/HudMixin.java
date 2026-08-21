@@ -114,7 +114,7 @@ public class HudMixin {
                     double x0 = xMobs.get(i) * coordsSize + 10;
                     double y0 = yMobs.get(i) * coordsSize + 10;
 
-                    Identifier location = paths.get(mobName.substring(0, 16)); //Lascia stare il substring quello non lo ho ancora testato, è per risolvere il problema della sovrascrizione della mappa
+                    Identifier location = paths.get(mobName.substring(0, 16));
                     if (location != null) {
                         graphics.blit(RenderPipelines.GUI_TEXTURED, location, (int) x0, (int) y0, 0.0f, 0.0f, dimensionSize, dimensionSize, 8, 8, 8, 8);
                     }

@@ -1,5 +1,6 @@
 package io.github.orlisan.caputmundi.entities.goals;
 
+import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -83,6 +84,8 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
                 start();
             } else {
                 int radius = Math.random() > 0.5 ? 10 : 15;
+                entity.getNavigation().stop();
+                CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
                 entity.getNavigation().moveTo(entity.padrone.getX() - radius, entity.padrone.position().y + 30, entity.padrone.getZ(), 1.5);
                 isNavigationToPadrone = true;
             }
@@ -94,6 +97,8 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
             double cos = raggioDalCerchio * Math.cos(aquilaInc * (Math.PI / 180));
             double sin = raggioDalCerchio * Math.sin(aquilaInc * (Math.PI / 180)) + realCentroCerchio.getX();
             // LOGGER.info("cos:{}, sin:{}, entità:{}", cos, sin, entity.getId());
+            entity.getNavigation().stop();
+            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ(), 1.0);
             // LOGGER.info("entity:{}, pos:{}", entity.getId(), entity.position());
             entity.getLookControl().setLookAt(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ());

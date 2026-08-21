@@ -12,25 +12,30 @@ import io.github.orlisan.caputmundi.entities.goals.AttaccoDistanzaGoal;
 import io.github.orlisan.caputmundi.entities.goals.AttaccoRavvicinatoGoal;
 import io.github.orlisan.caputmundi.entities.goals.DecolloGoal;
 import io.github.orlisan.caputmundi.entities.goals.RuotaInCerchioGoal;
+import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.control.LookControl;
+import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Creeper;
@@ -73,6 +78,10 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> HAS_COLLAR =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
 
+    private static final EntityDataAccessor<Boolean> HAS_ARMOR =
+            SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
+
+
     @Override
     protected void actuallyHurt(ServerLevel level, DamageSource source, float dmg) {
         if (source.is(DamageTypes.FALL)) return;
@@ -106,36 +115,48 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     protected void defineSynchedData(SynchedEntityData.Builder entityData) {
         super.defineSynchedData(entityData);
         entityData.define(HAS_COLLAR, false);
+        entityData.define(HAS_ARMOR, false);
     }
 
     public boolean hasCollar() {
         return this.entityData.get(HAS_COLLAR);
     }
+    public boolean hasArmor() {
+        return this.entityData.get(HAS_ARMOR);
+    }
 
     public void setHasCollar(boolean newCollar) {
         this.entityData.set(HAS_COLLAR, newCollar);
     }
-
+    public void setHasArmor(boolean newArmor) {
+        this.entityData.set(HAS_ARMOR, newArmor);
+        AttributeInstance abs = this.getAttribute(Attributes.MAX_ABSORPTION);
+        if(abs != null) abs.setBaseValue(10);
+        AttributeInstance healt = this.getAttribute(Attributes.MAX_HEALTH);
+        if(healt != null) healt.setBaseValue(30);
+        AttributeInstance dmg = this.getAttribute(Attributes.ATTACK_DAMAGE);
+        if(dmg != null) dmg.setBaseValue(5);
+    }
     public ServerPlayer padrone = null;
     public static final double DURATA_VOLO = 2.5;
 
     protected AquilaEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
-        this.moveControl = new FlyingMoveControl<>(this, 10, true);
+        this.moveControl = new AquilaMoveControl<>(this/*, 10, true*/);
+        this.lookControl = new AquilaLookControl(this);
         this.setHasCollar(false);
+        setXRot(90);
     }
 
     public static final Item ADDOMESTICATION_ITEM = Items.RABBIT_FOOT;
 
     @Override
     public @NotNull InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
-        LOGGER.info("Interact Chiamato");
         super.interact(player, hand, location);
-        LOGGER.info("Dopo super, ci sono ancora");
         if (!player.level().isClientSide()) {
             ItemStack stack = player.getItemInHand(hand);
-            LOGGER.info("Item:{}, hand:{}", stack, hand);
             LOGGER.info(String.valueOf(stack.getItem() == ADDOMESTICATION_ITEM));
+            LOGGER.info("Item:{}", stack.getItem());
             if (stack.getItem() == ADDOMESTICATION_ITEM) {
                 if (this.padrone == null) {
                     if (!player.isCreative())
@@ -149,12 +170,22 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         player.swing(hand);
                         this.setPersistenceRequired();
                         return InteractionResult.SUCCESS;
+                    }else {
+                        RandomSource random = RandomSource.create();
+                        for (int i = 0; i < 6; i++) {
+                            level().addParticle(ParticleTypes.ASH, this.position().x + random.nextInt(-1, 1), this.position().y + random.nextInt(-1, 1), this.position().z + random.nextInt(-1, 1), 0, 0, 0);
+                        }
                     }
                     //     LOGGER.info("Non passato random");
                 } else {
                     this.heal(Math.random() > 0.5 ? 3 : 4);
                     if (!player.isCreative())
                         player.setItemInHand(hand, new ItemStack(stack.getItem(), stack.getCount() - 1));
+                }
+            }else if(stack.getItem() == CaputMundiItems.AQUILA_ARMOR_ITEM) {
+                if(padrone != null && padrone == player) {
+                    LOGGER.info("Ci sono dentro all'armors");
+                    setHasArmor(true);
                 }
             }
         }
@@ -165,12 +196,33 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 5.0f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 1.0);
     }
 
+
     @Override
     public void tick() {
         super.tick();
+
+        // --- LOG DIAGNOSTICO RIMBALZO ---
+        /*double wx = Double.NaN, wy = Double.NaN, wz = Double.NaN;
+        try {
+            java.lang.reflect.Field fX = net.minecraft.world.entity.ai.control.MoveControl.class.getDeclaredField("wantedX");
+            java.lang.reflect.Field fY = net.minecraft.world.entity.ai.control.MoveControl.class.getDeclaredField("wantedY");
+            java.lang.reflect.Field fZ = net.minecraft.world.entity.ai.control.MoveControl.class.getDeclaredField("wantedZ");
+            fX.setAccessible(true);
+            fY.setAccessible(true);
+            fZ.setAccessible(true);
+            wx = (double) fX.get(this.moveControl);
+            wy = (double) fY.get(this.moveControl);
+            wz = (double) fZ.get(this.moveControl);
+        } catch (Exception e) {
+            LOGGER.error("Reflection fail nel log diagnostico", e);
+        }*/
+
+     //   LOGGER.info("DIAG tick={} pos=({},{},{}) delta=({},{},{}) onGround={} navDone={} Speed={} wanted=({},{},{}) startDecollo={} ruotaInCerchio={} distanceAttack={} vicinoAttack={} isFlying={}", tickCounter, position().x, position().y, position().z, getDeltaMovement().x, getDeltaMovement().y, getDeltaMovement().z, onGround(), getNavigation().isDone(), getSpeed(), wx, wy, wz, startDecollo, ruotaInCerchio, distanceAttack, vicinoAttack, isFlying);
+        // --- FINE LOG DIAGNOSTICO ---
+
         //LOGGER.info("Aquila:{}, vola:{}, posizione:{}, superIsNOGravity:{}, isNOGravity:{}, haPadrone:{}", getId(), isFlying, position(), super.isNoGravity(), isNoGravity(), padrone != null);
         tickCounter++;
-        if (!startDecollo) {
+        if (!startDecollo && !distanceAttack && !vicinoAttack) {
             startRuotaInCerchio();
         }
         if (padrone != null) {
@@ -376,5 +428,63 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public @NotNull AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+    //Come il phantom
+    private class AquilaLookControl extends LookControl {
+        public AquilaLookControl(Mob mob) {
+            super(mob);
+        }
+        @Override
+        public void tick() {
+        }
+    }
+    private class AquilaMoveControl<T extends Mob> extends /*Flying*/MoveControl<T> {
+        private float speed;
+
+        public AquilaMoveControl(final T mob/*, int qualcosa, boolean hoversInPlace*/) {
+            super(mob/*, qualcosa, hoversInPlace*/);
+            this.speed = (float) (0.1F * getSpeedModifier());
+        }
+
+        @Override
+        public void tick() {
+            if (AquilaEntity.this.horizontalCollision) {
+                AquilaEntity.this.setYRot(AquilaEntity.this.getYRot() + 180.0F);
+                this.speed = (float) (0.1F * getSpeedModifier());
+            }
+
+            double tdx = this.getWantedX() - AquilaEntity.this.getX();
+            double tdy = this.getWantedY() - AquilaEntity.this.getY();
+            double tdz = this.getWantedZ() - AquilaEntity.this.getZ();
+            double sd = Math.sqrt(tdx * tdx + tdz * tdz);
+            if (Math.abs(sd) > (double) 1.0E-5F) {
+                double yRelativeScale = (double) 1.0F - Math.abs(tdy * (double) 0.7F) / sd;
+                tdx *= yRelativeScale;
+                tdz *= yRelativeScale;
+                sd = Math.sqrt(tdx * tdx + tdz * tdz);
+                double sd2 = Math.sqrt(tdx * tdx + tdz * tdz + tdy * tdy);
+                float prev = AquilaEntity.this.getYRot();
+                float angle = (float) Mth.atan2(tdz, tdx);
+                float a = Mth.wrapDegrees(AquilaEntity.this.getYRot() + 90.0F);
+                float b = Mth.wrapDegrees(angle * (180F / (float) Math.PI));
+                AquilaEntity.this.setYRot(Mth.approachDegrees(a, b, 4.0F) - 90.0F);
+                AquilaEntity.this.yBodyRot = AquilaEntity.this.getYRot();
+                if (Mth.degreesDifferenceAbs(prev, AquilaEntity.this.getYRot()) < 3.0F) {
+                    this.speed = Mth.approach(this.speed, 1.8F, 0.005F * (1.8F / this.speed));
+                } else {
+                    this.speed = Mth.approach(this.speed, 0.2F, 0.025F);
+                }
+
+                float xRotD = (float) (-(Mth.atan2(-tdy, sd) * (double) (180F / (float) Math.PI)));
+                AquilaEntity.this.setXRot(xRotD);
+                float moveAngle = AquilaEntity.this.getYRot() + 90.0F;
+                double txd = (double) (this.speed * Mth.cos(moveAngle * ((float) Math.PI / 180F))) * Math.abs(tdx / sd2);
+                double tzd = (double) (this.speed * Mth.sin(moveAngle * ((float) Math.PI / 180F))) * Math.abs(tdz / sd2);
+                double tyd = (double) (this.speed * Mth.sin(xRotD * ((float) Math.PI / 180F))) * Math.abs(tdy / sd2);
+                Vec3 movement = AquilaEntity.this.getDeltaMovement();
+                AquilaEntity.this.setDeltaMovement(movement.add((new Vec3(txd, tyd, tzd)).subtract(movement).scale(0.2)));
+            }
+
+        }
     }
 }
