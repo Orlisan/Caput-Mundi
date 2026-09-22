@@ -222,6 +222,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                     if (Math.random() < 0.3d) {
                         //       LOGGER.info("Passato random");
                         this.padrone = (ServerPlayer) player;
+                        this.ruotaInCerchio = false;
+                        this.startRichiama();
                         this.centroCerchio = BlockPos.containing(location);
                         changedCenter = true;
                         this.setHasCollar(true);

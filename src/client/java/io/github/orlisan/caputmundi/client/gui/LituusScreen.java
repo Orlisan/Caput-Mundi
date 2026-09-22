@@ -44,6 +44,12 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
         MAP
     }
 
+    @Override
+    public void removed() {
+        sendCommand("stopsend");
+        super.removed();
+    }
+
     public List<List<Identifier>> vistaAquila = new ArrayList<>();
     public List<String> mobs = new ArrayList<>();
     public List<Double> xMobs = new ArrayList<>();
