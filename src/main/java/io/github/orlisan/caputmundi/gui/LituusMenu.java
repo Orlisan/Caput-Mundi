@@ -1,6 +1,7 @@
 package io.github.orlisan.caputmundi.gui;
 
 import io.github.orlisan.caputmundi.CaputMundiConstants;
+import io.github.orlisan.caputmundi.items.LituusItem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +15,7 @@ public class LituusMenu extends AbstractContainerMenu {
     public LituusMenu(int containerId, ServerPlayer player) {
         super(CaputMundiMenuTypes.LITUUS_MENU, containerId);
         this.player = player;
+
     }
 
     public LituusMenu(int id, Inventory ignoredInv) {
@@ -32,14 +34,6 @@ public class LituusMenu extends AbstractContainerMenu {
    /* public boolean hasAquila() {
         return player.getAttached(CaputMundiConstants.AQUILA_VISUALIZZATA) != null;
     }*/
-    public void spyPlayer(String playerName) {
-        if (playerToSpy != null) {
-            for (ServerPlayer player : player.level().players()) {
-                if (player.getName().getString().equals(playerName)) {
-                    playerToSpy = player;
-                }
-            }
-        }
-    }
+
 
 }

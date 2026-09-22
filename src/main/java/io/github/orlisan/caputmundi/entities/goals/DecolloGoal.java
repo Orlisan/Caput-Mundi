@@ -28,19 +28,6 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
         return !entity.getNavigation().isDone();
     }
 
-  /*  @Override
-    public void tick() {
-        if (isSimilarPos(targetPos, entity.blockPosition())) {
-            entity.startDecollo = false;
-        }
-        super.tick();
-    }*/
-
-    static boolean isSimilarPos(BlockPos a, BlockPos b) {
-        return Math.abs(a.getX() - b.getX()) < 1 &&
-               Math.abs(a.getY() - b.getY()) < 1 &&
-               Math.abs(a.getZ() - b.getZ()) < 1;
-    }
 
     BlockPos targetPos;
 
@@ -80,6 +67,15 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
     public void stop() {
         CaputMundi.LOGGER.info("DecolloGoal finito, entity:{}", entity.getId());
         entity.startDecollo = false;
+        if (entity.cosaDaFare != null) {
+            if (entity.cosaDaFare == AquilaEntity.ThingsToDoAfterDecollo.ATTACKDISTANZA) {
+                entity.startAttaccoADistanza();
+            } else if (entity.cosaDaFare == AquilaEntity.ThingsToDoAfterDecollo.MOVETOPLAYER) {
+                entity.startGoToPlayer(entity.playerToSpyDopo);
+            } else if(entity.cosaDaFare == AquilaEntity.ThingsToDoAfterDecollo.RUOTAINCERCHIO) {
+                entity.startRuotaInCerchio();
+            }
+        }
         super.stop();
     }
 }

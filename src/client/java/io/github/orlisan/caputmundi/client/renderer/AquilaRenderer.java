@@ -108,7 +108,43 @@ class ArmorRenderLayer extends GeoRenderLayer<@NotNull AquilaEntity, Void, @NotN
                             Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
                     snapshots.get("osso34").ifPresent(snapshot -> snapshot.skipRender(
                             Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
-                }
+                    snapshots.get("pezzodipiume29").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume30").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume31").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume38").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume39").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume40").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume32").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume33").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume34").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume35").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume36").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume37").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume41").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume42").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume43").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume44").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume45").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+                    snapshots.get("pezzodipiume46").ifPresent(snapshot -> snapshot.skipRender(
+                            Boolean.FALSE.equals(state.getGeckolibData(CaputMundiConstants.HAS_ARMOR))));
+        }
         );
     }
 }

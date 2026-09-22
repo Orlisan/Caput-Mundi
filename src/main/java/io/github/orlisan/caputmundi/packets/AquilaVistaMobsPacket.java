@@ -8,6 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 
 //Non so come serializzare i records
 public record AquilaVistaMobsPacket(List<String> names, List<Double> xs,
-                                    List<Double> ys) implements CustomPacketPayload {
+                                    List<Double> ys, List<Vec3> positions) implements CustomPacketPayload {
 
     @Override
     public @NotNull Type<? extends @NotNull CustomPacketPayload> type() {
@@ -35,7 +36,16 @@ public record AquilaVistaMobsPacket(List<String> names, List<Double> xs,
         for (double i = buf.readDouble(); !(i == Double.MIN_VALUE); i = buf.readDouble()) {
             ys.add(i);
         }
-        this(nomi, xs, ys);
+        List<Vec3> positions = new ArrayList<>();
+        List<Double> foundeds = new ArrayList<>();
+        for (double i = buf.readDouble(); !(i == Double.MAX_VALUE); i = buf.readDouble()) {
+            foundeds.add(i);
+            if(foundeds.size() == 3) {
+               positions.add(new Vec3(foundeds.get(0), foundeds.get(1), foundeds.get(2)));
+               foundeds.clear();
+            }
+        }
+        this(nomi, xs, ys, positions);
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -51,6 +61,12 @@ public record AquilaVistaMobsPacket(List<String> names, List<Double> xs,
             buf.writeDouble(y);
         }
         buf.writeDouble(Double.MIN_VALUE);
+        for(Vec3 loc: this.positions) {
+            buf.writeDouble(loc.x);
+            buf.writeDouble(loc.y);
+            buf.writeDouble(loc.z);
+        }
+        buf.writeDouble(Double.MAX_VALUE);
     }
 
     public static final StreamCodec<FriendlyByteBuf, AquilaVistaMobsPacket> CODEC =

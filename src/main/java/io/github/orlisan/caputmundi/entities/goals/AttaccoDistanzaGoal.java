@@ -32,7 +32,7 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
                 entity.distanceAttack = false;
             }
             entity.getNavigation().stop();
-            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
+      //      CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(entity.getTarget(), 5.0);
             entity.setAggressive(true);
         } else {
@@ -44,7 +44,7 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
                 if (random.nextDouble() > 0.3) {
                     entity.setTarget(mob);
                     entity.getNavigation().stop();
-                    CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
+       //             CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
                     entity.getNavigation().moveTo(entity.getTarget(), 5.0);
                     entity.getLookControl().setLookAt(entity.getTarget());
                     entity.setAggressive(true);
@@ -60,15 +60,21 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
     public void tick() {
         super.tick();
 
-        if (entity.getTarget() != null && entity.distanceTo(entity.getTarget()) < 3.0f) {
+       if (entity.getTarget() != null && entity.distanceTo(entity.getTarget()) < 3.0f) {
             entity.getTarget().hurtServer(getServerLevel(entity.level()), this.entity.level().damageSources().fall(), (float) ((initialY - entity.getY()) / 1.5));
             entity.distanceAttack = false;
             entity.vicinoAttack = true;
         } else if (entity.getTarget() != null) {
             entity.getNavigation().stop();
-            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
+         //   CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(entity.getTarget(), 5.0);
             entity.getLookControl().setLookAt(entity.getTarget());
         }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        entity.setStartDecolloAnim(true);
     }
 }

@@ -3,7 +3,6 @@
   "package": "io.github.orlisan.caputmundi.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "HudMixin",
     "LanguageClientMixin",
     "ScreenMixin",
     "SplashManagerMixin"

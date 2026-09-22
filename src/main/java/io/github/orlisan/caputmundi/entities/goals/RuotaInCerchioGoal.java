@@ -1,14 +1,13 @@
 package io.github.orlisan.caputmundi.entities.goals;
 
-import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 
-import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
-
 import java.util.EnumSet;
+
+import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
 public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
 
@@ -32,9 +31,7 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
     public void start() {
         super.start();
         entity.isFlying = true;
-        if (entity.padrone != null) {
-            hasPadrone = true;
-        }
+        hasPadrone = entity.padrone != null;
         if (entity.centroCerchio != AquilaEntity.NO_CENTER) {
             centroCerchio = entity.centroCerchio;
 
@@ -44,7 +41,7 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
                     Math.random() > 0.5 ? entity.blockPosition().getZ() + radius : entity.blockPosition().getZ() - radius);
         }
         raggioDalCerchio = distanceTo2d(entity.position(), Vec3.atCenterOf(hasPadrone ? BlockPos.containing(entity.padrone.position()) : centroCerchio));
-        LOGGER.info("raggio: {}, entità:{}", raggioDalCerchio, entity.getId());
+  //      LOGGER.info("raggio: {}, entità:{}", raggioDalCerchio, entity.getId());
         aquilaInc = findStartInc(entity.blockPosition());
     }
 
@@ -52,8 +49,9 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
         BlockPos realCentroCerchio = hasPadrone ? BlockPos.containing(entity.padrone.position()) : centroCerchio;
         final double X = punto.getX() - realCentroCerchio.getX();
         final double Z = punto.getZ() - realCentroCerchio.getZ();
-        double arcoseno = Math.asin((double) X / raggioDalCerchio) * 180 / Math.PI;
-        LOGGER.info("X: {}, Z:{}, asin:{}, punto:{}, entità:{}", X, Z, arcoseno, punto, entity.getId());
+        double a = X / raggioDalCerchio;
+        double arcoseno = Math.asin(Math.clamp(a, -1.0, 1.0)) * 180 / Math.PI;
+   //     LOGGER.info("X: {}, Z:{}, asin:{}, punto:{}, entità:{}", X, Z, arcoseno, punto, entity.getId());
         double inclinazioneFinale = 0;
         if (arcoseno < 0) {
             if (Z > 0) {
@@ -85,10 +83,12 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
             } else {
                 int radius = Math.random() > 0.5 ? 10 : 15;
                 entity.getNavigation().stop();
-                CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
+       //         CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
                 entity.getNavigation().moveTo(entity.padrone.getX() - radius, entity.padrone.position().y + 30, entity.padrone.getZ(), 1.5);
                 isNavigationToPadrone = true;
             }
+        }else if(entity.padrone == null && hasPadrone) {
+            hasPadrone = false;
         }
 
         if (entity.getNavigation().isDone()) {
@@ -98,7 +98,7 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
             double sin = raggioDalCerchio * Math.sin(aquilaInc * (Math.PI / 180)) + realCentroCerchio.getX();
             // LOGGER.info("cos:{}, sin:{}, entità:{}", cos, sin, entity.getId());
             entity.getNavigation().stop();
-            CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
+  //          CaputMundi.LOGGER.info("Stop navigation, moveTo sta per essere chiamato. entity:{}", entity.getId());
             entity.getNavigation().moveTo(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ(), 1.0);
             // LOGGER.info("entity:{}, pos:{}", entity.getId(), entity.position());
             entity.getLookControl().setLookAt(sin, realCentroCerchio.getY(), -cos + realCentroCerchio.getZ());
@@ -108,5 +108,11 @@ public class RuotaInCerchioGoal extends AquilaGoalConCostruttore {
 
     public double distanceTo2d(Vec3 a, Vec3 b) {
         return Math.sqrt(Math.pow(a.x() - b.x(), 2) + Math.pow(a.z() - b.z(), 2));
+    }
+
+    @Override
+    public void stop() {
+        entity.ruotaInCerchio = false;
+        super.stop();
     }
 }

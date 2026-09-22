@@ -22,8 +22,10 @@ public class AttaccoRavvicinatoGoal extends MeleeAttackGoal {
     @Override
     public void stop() {
         if (mob instanceof AquilaEntity entity) {
+            entity.vicinoAttack = false;
             entity.startDecollo = true;
         }
+        mob.getNavigation().stop();
         super.stop();
     }
 }

@@ -22,6 +22,8 @@ public final class CaputMundiConstants {
     public static final DataTicket<Boolean> HAS_ARMOR =
             DataTickets.create("has_armor", new TypeToken<>() {
             });
+    public static final String NULLID = "00000000-0000-0000-0000-000000000000";
+
     public static final AttachmentType<AquilaEntity> AQUILA_VISUALIZZATA =
             AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila_visualizzata"));
     public static final int PACKET_STRING_MAX_LENGTH = 32767;

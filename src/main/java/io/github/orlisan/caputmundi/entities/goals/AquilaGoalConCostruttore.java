@@ -10,4 +10,9 @@ public abstract class AquilaGoalConCostruttore extends Goal {
         this.entity = entity;
     }
 
+    @Override
+    public void stop() {
+        entity.getNavigation().stop();
+        super.stop();
+    }
 }
