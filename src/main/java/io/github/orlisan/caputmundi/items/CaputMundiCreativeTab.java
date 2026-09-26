@@ -22,7 +22,7 @@ public class CaputMundiCreativeTab {
                             output.accept(CaputMundiItems.IMPERIAL_GOLD_INGOT);
                             output.accept(CaputMundiItems.AQUILA_SPAWN_EGG_ITEM);
                             output.accept(CaputMundiItems.AQUILA_ARMOR_ITEM);
-                            //       output.accept(CaputMundiItems.GOLDEN_LAURUS_CROWN);
+                            output.accept(CaputMundiItems.GOLDEN_LAURUS_CROWN);
                         })
                         .build());
     }

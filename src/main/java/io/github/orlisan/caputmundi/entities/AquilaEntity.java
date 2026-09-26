@@ -28,6 +28,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -52,11 +53,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -67,7 +70,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache cache =
             GeckoLibUtil.createInstanceCache(this);
     public boolean isFlying = true;
-    public boolean startDecollo = true;
+    public boolean startDecollo = false;
     public static final BlockPos NO_CENTER = new BlockPos(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
     public boolean ruotaInCerchio = false;
     public boolean changedCenter = false;
@@ -80,6 +83,13 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public boolean startSendVista = false;
     private static final EntityDataAccessor<Boolean> HAS_COLLAR =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
+        var ret = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+        startDecollo();
+        return ret;
+    }
 
     private static final EntityDataAccessor<Boolean> STARTATTERRAGGIO =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
@@ -160,7 +170,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         entityData.define(HAS_COLLAR, false);
         entityData.define(HAS_ARMOR, false);
         entityData.define(STARTATTERRAGGIO, false);
-        entityData.define(STARTDECOLLO, true);
+        entityData.define(STARTDECOLLO, false);
     }
 
     public ItemStack lituus;
@@ -223,6 +233,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         //       LOGGER.info("Passato random");
                         this.padrone = (ServerPlayer) player;
                         this.ruotaInCerchio = false;
+                        this.startDecollo = false;
                         this.startRichiama();
                         this.centroCerchio = BlockPos.containing(location);
                         changedCenter = true;
@@ -426,10 +437,10 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
 
     public void startDecollo() {
-        IO.println("StartDecollo chiamato");
+   //     IO.println("StartDecollo chiamato");
         this.startDecollo = true;
         this.setStartDecolloAnim(true);
-        IO.println("getStartDecolloAnim: " + getStartDecolloAnim());
+    //    IO.println("getStartDecolloAnim: " + getStartDecolloAnim());
     }
 
     @Override
@@ -444,18 +455,16 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>("movement", 0, state -> {
 
-            if (tickCounter % 5 == 0) {
-                IO.println("Anim: " + state.controller().getCurrentRawAnimation() + ", getStartDecolloAnim: " + getStartDecolloAnim() + ", getStartAtterraggioAnim()" + getStartAtterraggioAnim());
-            }
+
             if (getStartDecolloAnim()) {
                 //     (logPoint:"Voglio Decollare: atterraggioAnim"+getStartAtterraggioAnim() )
-              //  IO.println("Voglio Decollare: atterraggioAnim" + getStartAtterraggioAnim());
+                //  IO.println("Voglio Decollare: atterraggioAnim" + getStartAtterraggioAnim());
                 state.setAnimation(
                         RawAnimation.begin()
                                 .thenPlay("animazione_decollo").thenLoop("animazione_volo"));
                 setStartDecolloAnim(false);
                 ClientPlayNetworking.send(new LituusPacket("setfalse:decollo", this.stringUUID));
-              //  IO.println("Decollato: decolloAnim: " + getStartDecolloAnim() + "atterraggio:" + getStartAtterraggioAnim());
+                //  IO.println("Decollato: decolloAnim: " + getStartDecolloAnim() + "atterraggio:" + getStartAtterraggioAnim());
                 //(logPoint: "Decollato: decolloAnim: "+getStartDecolloAnim()+"atterraggio:"+getStartAtterraggioAnim())
             } else if (getStartAtterraggioAnim()) {
                 state.setAnimation(

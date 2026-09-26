@@ -3,6 +3,7 @@ package io.github.orlisan.caputmundi.client;
 import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.client.gui.LituusScreen;
 import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
+import io.github.orlisan.caputmundi.client.renderer.PilumRenderer;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import io.github.orlisan.caputmundi.gui.CaputMundiMenuTypes;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -21,7 +22,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 public class CaputMundiClient implements ClientModInitializer {
     StringBuilder vecchioSelected = new StringBuilder();
     public static boolean eraHardcore = false;
@@ -79,6 +79,10 @@ public class CaputMundiClient implements ClientModInitializer {
         EntityRenderers.register(
                 CaputMundiEntities.AQUILA,
                 AquilaRenderer::new
+        );
+        EntityRenderers.register(
+                CaputMundiEntities.PILUM,
+                PilumRenderer::new
         );
         //Builder per aggirare il voluto final delle lambda
         ClientPlayConnectionEvents.JOIN.register((_, _, client) -> {

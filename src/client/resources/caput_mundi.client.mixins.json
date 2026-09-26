@@ -5,7 +5,10 @@
   "client": [
     "LanguageClientMixin",
     "ScreenMixin",
-    "SplashManagerMixin"
+    "SplashManagerMixin",
+    "AvatarRenderMixin",
+    "AvatarRenderStateMixin",
+    "LayerDefinitionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
