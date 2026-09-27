@@ -28,7 +28,7 @@ public  class PilumRenderer extends EntityRenderer<PilumLanciato,PilumRenderStat
         return new PilumRenderState();
     }
 
-    protected Identifier getTextureLocation(PilumRenderState state) {
+    protected Identifier getTextureLocation() {
         return Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "textures/item/pilum_item.png");
     }
     @Override
@@ -36,7 +36,8 @@ public  class PilumRenderer extends EntityRenderer<PilumLanciato,PilumRenderStat
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0F));
         poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot));
-        submitNodeCollector.submitModel(this.model, state, poseStack, this.getTextureLocation(state), state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor, null);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-90.0F));
+        submitNodeCollector.submitModel(this.model, state, poseStack, this.getTextureLocation(), state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor, null);
         poseStack.popPose();
         super.submit(state, poseStack, submitNodeCollector, camera);
     }

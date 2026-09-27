@@ -39,8 +39,7 @@ public class PilumLanciato extends AbstractArrow {
     protected void onHitEntity(final EntityHitResult hitResult) {
         Entity entity = hitResult.getEntity();
         float dmg = 8.0F;
-        Entity currentOwner = this.getOwner();
-        DamageSource damageSource = this.damageSources().trident(this, currentOwner == null ? this : currentOwner);
+        DamageSource damageSource = this.damageSources().source(CaputMundiDamages.PILUM_DAMAGE, this, this.getOwner());
         Level var7;
 
         if (entity.hurtOrSimulate(damageSource, dmg)) {

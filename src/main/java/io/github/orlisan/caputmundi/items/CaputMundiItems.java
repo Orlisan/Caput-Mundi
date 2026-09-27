@@ -58,6 +58,6 @@ public class CaputMundiItems {
         IMPERIAL_GOLD_INGOT = registerItem("imperial_gold_ingot");
         AQUILA_ARMOR_ITEM = registerItem("aquila_armor");
         AQUILA_SPAWN_EGG_ITEM = registerItem("aquila_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(CaputMundiEntities.AQUILA));
-        PILUM = registerItem("pilum_item", PilumItem::new, new Item.Properties().attributes(PilumItem.createAttributes()));
+        PILUM = registerItem("pilum_item", PilumItem::new, new Item.Properties().attributes(PilumItem.createAttributes()).stacksTo(7));
     }
 }

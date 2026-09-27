@@ -13,8 +13,10 @@ public class AvatarTickMixin {
     @Inject(method="tick", at=@At("TAIL"))
     public void ticcaPila(CallbackInfo ci) {
         if(this instanceof PilaCountAccessor accessor) {
-            if(accessor.getPila$Count() > 0 && Math.random() <= 0.0001) {
+            if(accessor.getPila$Count() > 0 && Math.random() <= 0.001) {
+                IO.println("Prima di rimuovere: "+accessor.getPila$Count());
                 accessor.setPila$Count(accessor.getPila$Count()-1);
+                IO.println("Pilum Tolto di mezzo: "+accessor.getPila$Count());
             }
         }
     }
