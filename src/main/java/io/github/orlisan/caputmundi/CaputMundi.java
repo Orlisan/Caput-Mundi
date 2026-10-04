@@ -17,10 +17,13 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +79,32 @@ public class CaputMundi implements ModInitializer {
                                         }
                                         return 1;
                                     }))
+                            .then(Commands.literal("dimmigoal")
+                            .executes(context -> {
+                                try {
+                                    Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
+                                    for (Entity entity : entita) {
+                                        if (entity instanceof AquilaEntity aquilaEntity) {
+                                            context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquila: " + aquilaEntity.getId() + " goal attivo: " + aquilaEntity.getGoalSelector().getAvailableGoals().stream().filter(goal -> goal.isRunning()).toList().getFirst().getGoal().getClass().getSimpleName()).withColor(TextColor.YELLOW));
+                                        }
+                                    }
+                                }catch(Exception e) {
+                                    IO.println("Eccezzione: "+e);
+                                }finally{
+                                    return 1;
+                                }
+                            }))
+                            .then(Commands.literal("sullattenti")
+                                    .executes(context -> {
+                                        Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
+                                        for (Entity entity : entita) {
+                                            if (entity instanceof AquilaEntity aquilaEntity) {
+                                                aquilaEntity.stopAllGoals();
+                                                aquilaEntity.modeSullAttenti = true;
+                                           }
+                                        }
+                                        return 1;
+                                    }))
                     ));
         }));
         PayloadTypeRegistry.clientboundPlay().register(AquilaVistaPacket.TYPE, AquilaVistaPacket.CODEC);
@@ -90,6 +119,7 @@ public class CaputMundi implements ModInitializer {
                 if (entity != null) {
                     String[] split = packet.aquilaName().split(":");
                     if (split[0].equals("spy")) {
+                        entity.stopAllGoals();
                         if (Objects.equals(split[1], "stop")) {
                             entity.playerToSpy = null;
                             entity.startRuotaInCerchio();
@@ -97,7 +127,7 @@ public class CaputMundi implements ModInitializer {
                             entity.spyPlayer(split[1]);
 
                     } else if (split[0].equals("recall")) {
-                        entity.playerToSpy = null;
+                        entity.stopAllGoals();
                         entity.startRichiama();
                     }else if(split[0].equals("startsend")) {
                         entity.startSendVista = true;
@@ -109,6 +139,9 @@ public class CaputMundi implements ModInitializer {
                         }else if(split[1].equals("atterraggio")) {
                             entity.setStartAtterraggioAnim(false);
                         }
+                    }else if(split[0].equals("moveto")) {
+                        entity.stopAllGoals();
+                        entity.coordsToMove = new Vec3(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
                     }
                 }
             });

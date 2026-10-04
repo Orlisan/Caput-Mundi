@@ -6,7 +6,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
-public class  RichiamaGoal extends AquilaGoalConCostruttore{
+public class RichiamaGoal extends AquilaGoalConCostruttore {
     public RichiamaGoal(AquilaEntity entity) {
         super(entity);
         setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -16,8 +16,10 @@ public class  RichiamaGoal extends AquilaGoalConCostruttore{
     public boolean canUse() {
         return entity.richiama && entity.padrone != null;
     }
+
     Vec3 positionToAtter;
     int ranX, ranZ;
+
     @Override
     public void start() {
         super.start();
@@ -43,7 +45,8 @@ public class  RichiamaGoal extends AquilaGoalConCostruttore{
 
     @Override
     public void stop() {
-             entity.isFlying = false;
+        entity.isFlying = false;
+        entity.richiama = false;
     }
 }
 

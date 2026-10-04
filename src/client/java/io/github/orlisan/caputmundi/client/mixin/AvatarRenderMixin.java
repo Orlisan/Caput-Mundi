@@ -1,7 +1,7 @@
 package io.github.orlisan.caputmundi.client.mixin;
 
 import io.github.orlisan.caputmundi.client.renderer.layer.PilumLayer;
-import io.github.orlisan.caputmundi.PilaCountAccessor;
+import io.github.orlisan.caputmundi.accessors.PilaCountAccessor;
 import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -28,6 +28,6 @@ public abstract class AvatarRenderMixin<AvatarlikeEntity extends Avatar & Client
 
     @Inject(method = "extractRenderState*", at = @At("TAIL"))
     public void mettiPila(final AvatarlikeEntity entity, final AvatarRenderState state, final float partialTicks, CallbackInfo ci) {
-        ((PilaCountAccessor) state).setPila$Count(((PilaCountAccessor) entity).getPila$Count());
+        ((PilaCountAccessor) state).caput_mundi$setPilaCount(((PilaCountAccessor) entity).caput_mundi$getPilaCount());
     }
 }

@@ -28,7 +28,6 @@ public class DecolloGoal extends AquilaGoalConCostruttore {
         return !entity.getNavigation().isDone();
     }
 
-
     BlockPos targetPos;
 
     @Override

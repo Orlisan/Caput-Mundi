@@ -3,7 +3,7 @@ package io.github.orlisan.caputmundi.client.renderer.layer;
 import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.client.model.CaputMundiModelLayers;
 import io.github.orlisan.caputmundi.client.model.PilumModel;
-import io.github.orlisan.caputmundi.PilaCountAccessor;
+import io.github.orlisan.caputmundi.accessors.PilaCountAccessor;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -19,7 +19,7 @@ public class PilumLayer<M extends PlayerModel> extends StuckInBodyLayer<M, Pilum
 
     @Override
     protected int numStuck(@NonNull AvatarRenderState state) {
-        return ((PilaCountAccessor) state).getPila$Count();
+        return ((PilaCountAccessor) state).caput_mundi$getPilaCount();
     }
 }
 

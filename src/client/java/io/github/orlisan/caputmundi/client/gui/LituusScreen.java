@@ -7,20 +7,20 @@ import io.github.orlisan.caputmundi.packets.LituusPacket;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
+
+    public static final String DIGIT_REGEX = "[0-9]";
+
     public LituusScreen(LituusMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
     }
@@ -41,7 +44,8 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
     public enum LituusMode {
         SPY,
         OVERVIEW,
-        MAP
+        MAP,
+        ATTACK
     }
 
     @Override
@@ -57,20 +61,33 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
     public List<Vec3> realCoordsMobs = new ArrayList<>();
 
     boolean isSpying = false;
-    EditBox playerTargetEditBox;
+    LituusEditBox playerTargetEditBox;
+    LituusEditBox XeditBox;
+    LituusEditBox YeditBox;
+    LituusEditBox ZeditBox;
+    LituusEditBox[] editBoxs = null;
     LituusButton spyButton;
     LituusButton overviewModeButton;
     LituusButton spyModeButton;
     LituusButton richiamaButton;
     LituusButton mapModButton;
+    LituusButton attackModeButton;
+    LituusButton moveButton;
 
     public void setMode(LituusMode mode) {
         lituusMode = mode;
 
         spyButton.visible = false;
         playerTargetEditBox.visible = false;
+        XeditBox.visible = false;
+        YeditBox.visible = false;
+        ZeditBox.visible = false;
         playerTargetEditBox.setFocused(false);
+        XeditBox.setFocused(false);
+        YeditBox.setFocused(false);
+        ZeditBox.setFocused(false);
         richiamaButton.visible = false;
+        moveButton.visible = false;
 
         if (mode == LituusMode.OVERVIEW) {
             richiamaButton.visible = true;
@@ -78,8 +95,14 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
             spyButton.visible = true;
             playerTargetEditBox.visible = true;
             playerTargetEditBox.setFocused(true);
+            XeditBox.visible = true;
+            XeditBox.setFocused(true);
+            YeditBox.visible = true;
+            YeditBox.setFocused(true);
+            ZeditBox.visible = true;
+            ZeditBox.setFocused(true);
+            moveButton.visible = true;
         }
-
     }
 
     void sendCommand(String command) {
@@ -91,9 +114,22 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
     @Override
     protected void init() {
         super.init();
-        playerTargetEditBox = new EditBox(font, (int) (leftPos + imageWidth / 2.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"));
-        playerTargetEditBox.setSuggestion("Player name...");
+        playerTargetEditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 2.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"), "^[a-zA-Z0-9_]{3,16}$");
+        playerTargetEditBox.setHint(Component.literal("Player name..."));
+
+        XeditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 4), topPos + imageHeight / 4, 60, 30, Component.literal("A X"), DIGIT_REGEX);
+        XeditBox.setHint(Component.literal("X"));
+        YeditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 2), topPos + imageHeight / 4, 60, 30, Component.literal("A y"), DIGIT_REGEX);
+        YeditBox.setHint(Component.literal("Y"));
+        ZeditBox = new LituusEditBox(font, (int) (leftPos + imageWidth /1), topPos + imageHeight / 4, 60, 30, Component.literal("A z"), DIGIT_REGEX);
+        ZeditBox.setHint(Component.literal("Z"));
+
         playerTargetEditBox = addRenderableWidget(playerTargetEditBox);
+        XeditBox = addRenderableWidget(XeditBox);
+        YeditBox = addRenderableWidget(YeditBox);
+        ZeditBox = addRenderableWidget(ZeditBox);
+
+        editBoxs = new LituusEditBox[]{playerTargetEditBox, XeditBox, YeditBox, ZeditBox};
         overviewModeButton = addRenderableWidget(new LituusButton(() -> {
             setMode(LituusMode.OVERVIEW);
             sendCommand("stopsend");
@@ -115,18 +151,25 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
                 sendCommand("spy:" + (isSpying ? "stop" : playerTargetEditBox.getValue()) + ":" + minecraft.player.getStringUUID());
                 isSpying = !isSpying;
             }
-        }, leftPos + imageWidth / 4, topPos + imageHeight / 2, 100, 50, CaputMundiClient.ZOMBIE_SPRITE, 8, 8, 8, 8));
+        }, leftPos + imageWidth / 4, topPos + imageHeight / 2, 50, 25, CaputMundiClient.ZOMBIE_SPRITE, 8, 8, 8, 8));
         richiamaButton = addRenderableWidget(new LituusButton(() -> {
             if (this.getMode() != LituusMode.OVERVIEW) return;
             if (minecraft.player != null)
                 sendCommand("recall:" + minecraft.player.getStringUUID());
         }, leftPos + imageWidth / 4, topPos + imageHeight / 2, 100, 50, CaputMundiClient.SKELETON_SPRITE, 8, 8, 8, 8));
+        moveButton = addRenderableWidget(new LituusButton(() -> {
+            if(getMode() != LituusMode.SPY) return;
+            if(XeditBox.getValue().isBlank()) return;
+            if(YeditBox.getValue().isBlank()) return;
+            if(ZeditBox.getValue().isBlank()) return;
+            String value = "moveto:"+XeditBox.getValue()+":"+YeditBox.getValue()+":"+ZeditBox.getValue();
+            IO.println("Coordinate: "+value);
+            sendCommand(value);
+        },leftPos + imageWidth / 6, topPos + imageHeight /1, 50, 25, CaputMundiClient.CREEPER_SPRITE, 8, 8, 8, 8));
         setMode(LituusMode.OVERVIEW);
 
     }
 
-    EditBox xBox;
-    EditBox yBox;
     public boolean hasAquila = false;
     public String aquilaName = "Loading...";
     public Double aquilaHealth = Double.NaN;
@@ -143,7 +186,7 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
 
 
         if (getMode() == LituusMode.OVERVIEW) extractOverview(graphics);
-        if (getMode() == LituusMode.MAP) extractMap(graphics, mouseX, mouseY);
+        else if (getMode() == LituusMode.MAP) extractMap(graphics, mouseX, mouseY);
     }
 
     public static final int TRIGGER_RAGGIO = 16;
@@ -210,5 +253,22 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
 
     @Override
     protected void extractLabels(@NonNull GuiGraphicsExtractor graphics, int xm, int ym) {
+    }
+
+
+    @Override
+    public boolean keyPressed(@NotNull KeyEvent event) {
+        for(LituusEditBox box: editBoxs) {
+            if (box != null && box.isFocused()) {
+                if (event.key() == 69) {
+                    return true;
+                }
+                if (box.keyPressed(event)) {
+                    return true;
+                }
+                return super.keyPressed(event);
+            }
+        }
+        return super.keyPressed(event);
     }
 }

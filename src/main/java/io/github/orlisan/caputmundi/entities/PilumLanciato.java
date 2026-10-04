@@ -1,13 +1,14 @@
 package io.github.orlisan.caputmundi.entities;
 
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
-import io.github.orlisan.caputmundi.PilaCountAccessor;
+import io.github.orlisan.caputmundi.accessors.PilaCountAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -52,14 +53,16 @@ public class PilumLanciato extends AbstractArrow {
                 EnchantmentHelper.doPostAttackEffectsWithItemSourceOnBreak(serverLevel, entity, damageSource, this.getWeaponItem(), (weapon) -> this.kill(serverLevel));
             }
 
-            if (entity instanceof LivingEntity mob) {
+            if (entity instanceof LivingEntity mob && !(entity instanceof Player player && player.isCreative())) {
                 mob.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 1));
                 mob.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 1));
                 this.doKnockback(mob, damageSource);
                 this.doPostHurtEffects(mob);
             }
-            if (entity instanceof PilaCountAccessor pila) {
-                pila.setPila$Count(pila.getPila$Count() + 1);
+            if (entity instanceof PilaCountAccessor pila && entity instanceof Player player && !player.isCreative()) {
+                IO.println("PLAYER: "+player.getName()+" è stato colpito da un pilum, è in creativa?: "+player.isCreative()+" è invulnerabile? "+player.isInvulnerable());
+                pila.caput_mundi$setPilaCount(pila.caput_mundi$getPilaCount() + 1);
+                IO.println("Nuovo Pila Count "+pila.caput_mundi$getPilaCount());
             }
             this.discard();
         } else {

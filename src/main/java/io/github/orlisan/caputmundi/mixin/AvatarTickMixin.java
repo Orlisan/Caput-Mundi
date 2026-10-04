@@ -1,7 +1,6 @@
 package io.github.orlisan.caputmundi.mixin;
 
-import io.github.orlisan.caputmundi.PilaCountAccessor;
-import net.minecraft.util.Mth;
+import io.github.orlisan.caputmundi.accessors.PilaCountAccessor;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,10 +12,10 @@ public class AvatarTickMixin {
     @Inject(method="tick", at=@At("TAIL"))
     public void ticcaPila(CallbackInfo ci) {
         if(this instanceof PilaCountAccessor accessor) {
-            if(accessor.getPila$Count() > 0 && Math.random() <= 0.001) {
-                IO.println("Prima di rimuovere: "+accessor.getPila$Count());
-                accessor.setPila$Count(accessor.getPila$Count()-1);
-                IO.println("Pilum Tolto di mezzo: "+accessor.getPila$Count());
+            if(accessor.caput_mundi$getPilaCount() > 0 && Math.random() <= 0.001) {
+                IO.println("Prima di rimuovere: "+accessor.caput_mundi$getPilaCount());
+                accessor.caput_mundi$setPilaCount(accessor.caput_mundi$getPilaCount() - 1);
+                IO.println("Pilum Tolto di mezzo: "+accessor.caput_mundi$getPilaCount());
             }
         }
     }

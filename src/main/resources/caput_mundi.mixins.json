@@ -4,10 +4,12 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "AvatarMixin",
-    "LivingEntityHurtMixin",
     "AvatarTickMixin",
+    "LivingEntityHurtMixin",
+    "LivingEntityHurtOrHurtingMixin",
     "PlayerBlockingMixin",
-    "PotionBrewingMixin"
+    "PotionBrewingMixin",
+    "LivingEntityHurtingByProjectileMixin"
   ],
   "injectors": {
     "defaultRequire": 1

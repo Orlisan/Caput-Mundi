@@ -47,7 +47,7 @@ public class LituusItem extends Item {
             String aquilaUUID = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getString("AquilaUUID").orElse(CaputMundiConstants.NULLID);
             AquilaEntity aquila = (AquilaEntity) level.getEntity(UUID.fromString(aquilaUUID));
             boolean b = aquila != null;
-            ServerPlayNetworking.send((ServerPlayer) player, new LituusPacket(b, b?aquila.getName().getString():"No Aquila",b?aquila.getHealth():Double.NaN, b?aquilaUUID:"No Aquila"));
+            ServerPlayNetworking.send((ServerPlayer) player, new LituusPacket(b, b?aquila.getName().getString():"No Aquila",b?aquila.getHealth():Double.NaN, b?aquilaUUID:CaputMundiConstants.NULLID));
         }
         return InteractionResult.SUCCESS;
     }

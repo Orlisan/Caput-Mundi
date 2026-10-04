@@ -17,9 +17,9 @@ public class LivingEntityHurtMixin {
     @Unique
     LivingEntity self = (LivingEntity) (Object) this;
 
-    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"),/* argsOnly = true,*/ ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"),/* argsOnly = true,*/  argsOnly = true, name = "dmg")
     private float detraeDannoCorona(float dmg) {
-        CaputMundi.LOGGER.info("ActuallyHurt chiamato, self: " + self.toString());
+      //  CaputMundi.LOGGER.info("ActuallyHurt chiamato, self: " + self.toString());
         ItemStack itemBySlot = self.getItemBySlot(EquipmentSlot.HEAD);
         Item item = itemBySlot.getItem();
         if (item == CaputMundiItems.LAURUS_CROWN) {

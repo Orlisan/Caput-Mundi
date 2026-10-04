@@ -8,6 +8,7 @@ import com.geckolib.animation.RawAnimation;
 import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import io.github.orlisan.caputmundi.CaputMundiConstants;
+import io.github.orlisan.caputmundi.accessors.PlayerHurtedOrHurtingAccessor;
 import io.github.orlisan.caputmundi.entities.goals.*;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -78,9 +79,12 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public boolean richiama = false;
     public boolean distanceAttack = false;
     public boolean vicinoAttack = false;
+    public boolean modeSullAttenti = false;
     public ServerPlayer playerToSpy = null;
     public ServerPlayer playerToSpyDopo = null;
     public boolean startSendVista = false;
+    public static final Vec3 NO_MOVES = new Vec3(Double.MAX_VALUE, Double.NEGATIVE_INFINITY, Double.MIN_NORMAL);
+    public Vec3 coordsToMove = NO_MOVES;
     private static final EntityDataAccessor<Boolean> HAS_COLLAR =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -141,27 +145,27 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         if (source.is(DamageTypes.FALL)) return;
         Entity entity = source.getEntity();
         if (/*source.is(DamageTypes.MOB_ATTACK) &&*/ entity instanceof Mob livingEntity) {
-            if (this.distanceTo(entity) < 3.0f) {
-                vicinoAttack = true;
-            } else {
-                startAttaccoADistanza();
-            }
-            setTarget(livingEntity);
+            attacca(livingEntity);
         } else if (/*(source.is(DamageTypes.PLAYER_ATTACK) && source.is(DamageTypes.ARROW)) && */entity instanceof ServerPlayer player) {
             if (player == padrone && RandomSource.create().nextDouble() > 0.9) {
                 ServerPlayNetworking.send(padrone, new AquilaVistaPacket(new ArrayList<>()));
                 ServerPlayNetworking.send(padrone, new AquilaVistaMobsPacket(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
                 setHasCollar(false);
                 padrone = null;
+                padroneStringUUID = CaputMundiConstants.NULLID;
             }
-            if (this.distanceTo(entity) < 3.0f) {
-                vicinoAttack = true;
-            } else {
-                startAttaccoADistanza();
-            }
-            setTarget(player);
+            attacca(player);
         }
         super.actuallyHurt(level, source, dmg);
+    }
+
+    private void attacca(LivingEntity entity) {
+        if (this.distanceTo(entity) < 3.0f) {
+            vicinoAttack = true;
+        } else {
+            startAttaccoADistanza();
+        }
+        setTarget(entity);
     }
 
     @Override
@@ -198,6 +202,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public ServerPlayer padrone = null;
+    public String padroneStringUUID = CaputMundiConstants.NULLID;
+
     public static final double DURATA_VOLO = 2.5;
 
     public void spyPlayer(String playerName) {
@@ -232,8 +238,9 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                     if (Math.random() < 0.3d) {
                         //       LOGGER.info("Passato random");
                         this.padrone = (ServerPlayer) player;
-                        this.ruotaInCerchio = false;
-                        this.startDecollo = false;
+                        this.padroneStringUUID = player.getStringUUID();
+
+                        this.stopAllGoals();
                         this.startRichiama();
                         this.centroCerchio = BlockPos.containing(location);
                         changedCenter = true;
@@ -284,8 +291,16 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
      /*   if (!startDecollo && !distanceAttack && !vicinoAttack) {
             startRuotaInCerchio();
         }*/
-
+        if(padrone == null && !padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
+            var padronenullable = level().getPlayerByUUID(UUID.fromString(padroneStringUUID));
+            if(padronenullable != null && padronenullable instanceof ServerPlayer serverPlayer) {
+                padrone = serverPlayer;
+            }
+        }
         if (padrone != null) {
+            if(padrone instanceof PlayerHurtedOrHurtingAccessor ac && modeSullAttenti && ac.caput_mundi$isHurtedOrHurting() && ac.caput_mundi$aquilaTarget() != null) {
+                attacca(ac.caput_mundi$aquilaTarget());
+            }
             if (!level().isClientSide() && level() instanceof ServerLevel serverlvl) {
                 if (startSendVista && tickCounter % serverlvl.getGameRules().get(CaputMundiConstants.AQUILA_VIEW_UPDATE_TICKS) == 0) {
                     ArrayList<ArrayList<String>> vista = getAquilaVista();
@@ -380,14 +395,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         return new coordsMob(position.z - aabb.minZ, position.x - aabb.minX, position);
     }
 
-    @Override
-    public void remove(RemovalReason reason) {
-        if (padrone != null) {
-            lituus.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().remove("AquilaUUID");
-        }
-        super.remove(reason);
+   /* protected void addAdditionalSaveData(final ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("IsBaby", this.isBaby());
+        output.putBoolean("CanBreakDoors", this.canBreakDoors());
+        output.putInt("InWaterTime", this.isInWater() ? this.inWaterTime : -1);
+        output.putInt("DrownedConversionTime", this.isUnderWaterConverting() ? this.conversionTime : -1);
     }
-
+*/
     ArrayList<ArrayList<String>> getAquilaVista() {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> tempYList = new ArrayList<>();
@@ -435,6 +450,21 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         }
     }
 
+    public void stopAllGoals() {
+        this.startDecollo = false;
+        this.setStartDecolloAnim(false);
+        this.ruotaInCerchio = false;
+        this.setTarget(null);
+        this.distanceAttack = false;
+        this.vicinoAttack = false;
+        this.richiama = false;
+        this.setStartAtterraggioAnim(false);
+        this.startDecollo = false;
+        this.coordsToMove = AquilaEntity.NO_MOVES;
+        this.playerToSpy = null;
+        this.playerToSpyDopo = null;
+        this.cosaDaFare = null;
+    }
 
     public void startDecollo() {
    //     IO.println("StartDecollo chiamato");
@@ -454,7 +484,6 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>("movement", 0, state -> {
-
 
             if (getStartDecolloAnim()) {
                 //     (logPoint:"Voglio Decollare: atterraggioAnim"+getStartAtterraggioAnim() )
@@ -493,6 +522,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         this.goalSelector.addGoal(3, new RichiamaGoal(this));
         this.goalSelector.addGoal(4, new DecolloGoal(this));
         this.goalSelector.addGoal(5, new RuotaInCerchioGoal(this));
+        this.goalSelector.addGoal(6, new MoveToCoordGoal(this));
         super.registerGoals();
     }
 
