@@ -34,10 +34,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.control.LookControl;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
@@ -56,6 +59,8 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -74,6 +79,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public boolean startDecollo = false;
     public static final BlockPos NO_CENTER = new BlockPos(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
     public boolean ruotaInCerchio = false;
+    public boolean eNata = false;
     public boolean changedCenter = false;
     public BlockPos centroCerchio = NO_CENTER;
     public boolean richiama = false;
@@ -91,6 +97,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
         var ret = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+        eNata = true;
         startDecollo();
         return ret;
     }
@@ -101,6 +108,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> STARTDECOLLO =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
     public ThingsToDoAfterDecollo cosaDaFare = ThingsToDoAfterDecollo.RUOTAINCERCHIO;
+
 
     public enum ThingsToDoAfterDecollo {
         RUOTAINCERCHIO,
@@ -159,7 +167,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         super.actuallyHurt(level, source, dmg);
     }
 
-    private void attacca(LivingEntity entity) {
+    public void attacca(LivingEntity entity) {
         if (this.distanceTo(entity) < 3.0f) {
             vicinoAttack = true;
         } else {
@@ -193,12 +201,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     public void setHasArmor(boolean newArmor) {
         this.entityData.set(HAS_ARMOR, newArmor);
+        if(newArmor = true) {
         AttributeInstance abs = this.getAttribute(Attributes.MAX_ABSORPTION);
         if (abs != null) abs.setBaseValue(10);
         AttributeInstance healt = this.getAttribute(Attributes.MAX_HEALTH);
         if (healt != null) healt.setBaseValue(30);
         AttributeInstance dmg = this.getAttribute(Attributes.ATTACK_DAMAGE);
         if (dmg != null) dmg.setBaseValue(5);
+        }
     }
 
     public ServerPlayer padrone = null;
@@ -216,11 +226,13 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     protected AquilaEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
-        this.moveControl = new AquilaMoveControl<>(this/*, 10, true*/);
+        this.moveControl = new FlyingMoveControl<>(this, 10, true);
+        //   this.moveControl = new AquilaMoveControl<>(this/*, 10, true*/);
         this.lookControl = new AquilaLookControl(this);
         this.setHasCollar(false);
         setXRot(90);
     }
+
 
     public static final Item ADDOMESTICATION_ITEM = Items.RABBIT_FOOT;
 
@@ -281,7 +293,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 5.0f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 1.0);
+        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 0.6f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 0.3);
     }
 
     @Override
@@ -291,14 +303,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
      /*   if (!startDecollo && !distanceAttack && !vicinoAttack) {
             startRuotaInCerchio();
         }*/
-        if(padrone == null && !padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
+        if (padrone == null && !padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
             var padronenullable = level().getPlayerByUUID(UUID.fromString(padroneStringUUID));
-            if(padronenullable != null && padronenullable instanceof ServerPlayer serverPlayer) {
+            if (padronenullable instanceof ServerPlayer serverPlayer) {
                 padrone = serverPlayer;
             }
         }
         if (padrone != null) {
-            if(padrone instanceof PlayerHurtedOrHurtingAccessor ac && modeSullAttenti && ac.caput_mundi$isHurtedOrHurting() && ac.caput_mundi$aquilaTarget() != null) {
+            if (padrone instanceof PlayerHurtedOrHurtingAccessor ac && modeSullAttenti && ac.caput_mundi$isHurtedOrHurting() && ac.caput_mundi$aquilaTarget() != null) {
                 attacca(ac.caput_mundi$aquilaTarget());
             }
             if (!level().isClientSide() && level() instanceof ServerLevel serverlvl) {
@@ -330,6 +342,34 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public record coordsMob(double x, double y, Vec3 effectivePos) {
     }
 
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("isFlying", isFlying);
+        output.putString("padroneUUID", padroneStringUUID);
+        output.putBoolean("eNata", eNata);
+        output.putBoolean("hasArmor", hasArmor());
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        if (input.getBooleanOr("eNata", false)) {
+            this.isFlying = input.getBooleanOr("isFlying", false);
+            if (isFlying) {
+                this.setStartDecolloAnim(true);
+            } else {
+                this.setStartAtterraggioAnim(true);
+            }
+            this.setHasArmor(input.getBooleanOr("hasArmor", false));
+            this.padroneStringUUID = input.getStringOr("padroneUUID", CaputMundiConstants.NULLID);
+            if (!padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
+                this.setHasCollar(true);
+            }
+            this.startRuotaInCerchio();
+        }
+    }
+
     public Map<String, coordsMob> getMobs() {
         int posX = (int) Math.floor(position().x());
         int posY = (int) Math.floor(position().y());
@@ -357,7 +397,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             Player player = (Player) entity;
             coordsMob coords = findCoords(aabb, player.position());
             PlayerDatasPacket packet = new PlayerDatasPacket(player.getStringUUID(), player.getPlainTextName(), player.getHealth(), player.position(), new Vec2((float) coords.x, (float) coords.y));
-            IO.println("Packet: " + packet + " mapPos:" + coords.x + "," + coords.y);
+          //  IO.println("Packet: " + packet + " mapPos:" + coords.x + "," + coords.y);
             ServerPlayNetworking.send(this.padrone, packet);
             //      LOGGER.info("Mob:{}, Coords:{}", entity, findCoords(aabb, entity.position()));
         }
@@ -395,14 +435,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         return new coordsMob(position.z - aabb.minZ, position.x - aabb.minX, position);
     }
 
-   /* protected void addAdditionalSaveData(final ValueOutput output) {
-        super.addAdditionalSaveData(output);
-        output.putBoolean("IsBaby", this.isBaby());
-        output.putBoolean("CanBreakDoors", this.canBreakDoors());
-        output.putInt("InWaterTime", this.isInWater() ? this.inWaterTime : -1);
-        output.putInt("DrownedConversionTime", this.isUnderWaterConverting() ? this.conversionTime : -1);
-    }
-*/
+    /* protected void addAdditionalSaveData(final ValueOutput output) {
+         super.addAdditionalSaveData(output);
+         output.putBoolean("IsBaby", this.isBaby());
+         output.putBoolean("CanBreakDoors", this.canBreakDoors());
+         output.putInt("InWaterTime", this.isInWater() ? this.inWaterTime : -1);
+         output.putInt("DrownedConversionTime", this.isUnderWaterConverting() ? this.conversionTime : -1);
+     }
+ */
     ArrayList<ArrayList<String>> getAquilaVista() {
         ArrayList<ArrayList<String>> result = new ArrayList<>();
         ArrayList<String> tempYList = new ArrayList<>();
@@ -431,6 +471,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public void startRuotaInCerchio() {
+        stopAllGoals();
         IO.println("RuotaInCerchio Chiamato");
         if (isFlying) {
             this.ruotaInCerchio = true;
@@ -467,10 +508,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public void startDecollo() {
-   //     IO.println("StartDecollo chiamato");
+        stopAllGoals();
+        //     IO.println("StartDecollo chiamato");
         this.startDecollo = true;
         this.setStartDecolloAnim(true);
-    //    IO.println("getStartDecolloAnim: " + getStartDecolloAnim());
+        //    IO.println("getStartDecolloAnim: " + getStartDecolloAnim());
     }
 
     @Override
@@ -543,6 +585,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         }
     }
 
+    //Qui il rimbalzo non lo fa, ma non è preciso quindi non lo uso più
     private class AquilaMoveControl<T extends Mob> extends /*Flying*/MoveControl<T> {
         private float speed;
 

@@ -83,13 +83,14 @@ public class CaputMundi implements ModInitializer {
                             .executes(context -> {
                                 try {
                                     Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
+                                    context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquile: "+entita.size()));
                                     for (Entity entity : entita) {
                                         if (entity instanceof AquilaEntity aquilaEntity) {
                                             context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquila: " + aquilaEntity.getId() + " goal attivo: " + aquilaEntity.getGoalSelector().getAvailableGoals().stream().filter(goal -> goal.isRunning()).toList().getFirst().getGoal().getClass().getSimpleName()).withColor(TextColor.YELLOW));
                                         }
                                     }
                                 }catch(Exception e) {
-                                    IO.println("Eccezzione: "+e);
+                                    IO.println("Eccezione: "+e);
                                 }finally{
                                     return 1;
                                 }
@@ -142,6 +143,19 @@ public class CaputMundi implements ModInitializer {
                     }else if(split[0].equals("moveto")) {
                         entity.stopAllGoals();
                         entity.coordsToMove = new Vec3(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+                    }else if(split[0].equals("startruota")) {
+                        entity.stopAllGoals();
+                        entity.startRuotaInCerchio();
+                    }else if(split[0].equals("attack")) {
+                        entity.stopAllGoals();
+                        if (Objects.equals(split[1], "stopattack")) {
+                            entity.setTarget(null);
+                            entity.startRuotaInCerchio();
+                        } else {
+                            ServerPlayer playerByName = context.server().getPlayerList().getPlayerByName(split[1]);
+                            entity.attacca(playerByName);
+                        }
+
                     }
                 }
             });
