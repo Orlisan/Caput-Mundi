@@ -135,13 +135,13 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
     @Override
     protected void init() {
         super.init();
-        playerTargetEditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 2.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"), NAME_REGEX);
+        playerTargetEditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 1.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"), NAME_REGEX);
         playerTargetEditBox.setHint(Component.literal("Player name..."));
 
-        playerTargetEditBoxAttack = new LituusEditBox(font, (int) (leftPos + imageWidth / 2.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"), NAME_REGEX);
+        playerTargetEditBoxAttack = new LituusEditBox(font, (int) (leftPos + imageWidth / 1.5), topPos + imageHeight / 6, 100, 30, Component.literal("A player choosing editbox"), NAME_REGEX);
         playerTargetEditBoxAttack.setHint(Component.literal("Player name..."));
 
-        XeditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 4), topPos + imageHeight / 4, 30, 15, Component.literal("A X"), DIGIT_REGEX);
+        XeditBox = new LituusEditBox(font, leftPos + imageWidth / 4, topPos + imageHeight / 4, 30, 15, Component.literal("A X"), DIGIT_REGEX);
         XeditBox.setHint(Component.literal("X"));
         YeditBox = new LituusEditBox(font, (int) (leftPos + imageWidth / 2), topPos + imageHeight / 4, 30, 15, Component.literal("A y"), DIGIT_REGEX);
         YeditBox.setHint(Component.literal("Y"));
@@ -301,13 +301,11 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
 
     @Override
     public boolean keyPressed(final KeyEvent event) {
-        if (event.isEscape()) {
-            return true;
-        } else {
-            for(EditBox name: editBoxs) {
-                if(name.keyPressed(event) || name.canConsumeInput() || super.keyPressed(event)) return true;
+        if (!event.isEscape()) {
+            for (EditBox name : editBoxs) {
+                if (name.keyPressed(event) || name.canConsumeInput()) return true;
             }
-            return super.keyPressed(event);
         }
+        return super.keyPressed(event);
     }
 }

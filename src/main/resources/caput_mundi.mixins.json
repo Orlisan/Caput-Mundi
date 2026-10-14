@@ -5,11 +5,12 @@
   "mixins": [
     "AvatarMixin",
     "AvatarTickMixin",
+    "LivingEntityHurtingByProjectileMixin",
     "LivingEntityHurtMixin",
     "LivingEntityHurtOrHurtingMixin",
     "PlayerBlockingMixin",
     "PotionBrewingMixin",
-    "LivingEntityHurtingByProjectileMixin"
+    "SwingAnimationTypeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

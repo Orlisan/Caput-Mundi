@@ -8,7 +8,8 @@
     "SplashManagerMixin",
     "AvatarRenderMixin",
     "AvatarRenderStateMixin",
-    "LayerDefinitionsMixin"
+    "LayerDefinitionsMixin",
+    "HumanoidModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

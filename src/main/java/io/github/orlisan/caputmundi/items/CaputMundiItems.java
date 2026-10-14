@@ -21,7 +21,7 @@ public class CaputMundiItems {
     public static Item LAURUS_CROWN, GOLDEN_LAURUS_CROWN;
     public static Item IMPERIAL_GOLD_INGOT;
     public static Item AQUILA_SPAWN_EGG_ITEM, AQUILA_ARMOR_ITEM, LITUUS_ITEM;
-    public static Item PILUM;
+    public static Item PILUM, GLADIUS;
 
     private static Item registerItem(String id) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, id);
@@ -59,5 +59,6 @@ public class CaputMundiItems {
         AQUILA_ARMOR_ITEM = registerItem("aquila_armor");
         AQUILA_SPAWN_EGG_ITEM = registerItem("aquila_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(CaputMundiEntities.AQUILA));
         PILUM = registerItem("pilum_item", PilumItem::new, new Item.Properties().attributes(PilumItem.createAttributes()).stacksTo(7));
+        GLADIUS = registerItem("gladius_item", GladiusItem::new, new Item.Properties());
     }
 }

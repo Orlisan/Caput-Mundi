@@ -34,8 +34,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -169,6 +167,10 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     public void attacca(LivingEntity entity) {
         if (this.distanceTo(entity) < 3.0f) {
+            if(!isFlying) {
+                isFlying = true;
+                this.setStartDecolloAnim(true);
+            }
             vicinoAttack = true;
         } else {
             startAttaccoADistanza();
@@ -201,13 +203,13 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     public void setHasArmor(boolean newArmor) {
         this.entityData.set(HAS_ARMOR, newArmor);
-        if(newArmor = true) {
-        AttributeInstance abs = this.getAttribute(Attributes.MAX_ABSORPTION);
-        if (abs != null) abs.setBaseValue(10);
-        AttributeInstance healt = this.getAttribute(Attributes.MAX_HEALTH);
-        if (healt != null) healt.setBaseValue(30);
-        AttributeInstance dmg = this.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (dmg != null) dmg.setBaseValue(5);
+        if (newArmor) {
+            AttributeInstance abs = this.getAttribute(Attributes.MAX_ABSORPTION);
+            if (abs != null) abs.setBaseValue(10);
+            AttributeInstance healt = this.getAttribute(Attributes.MAX_HEALTH);
+            if (healt != null) healt.setBaseValue(30);
+            AttributeInstance dmg = this.getAttribute(Attributes.ATTACK_DAMAGE);
+            if (dmg != null) dmg.setBaseValue(5);
         }
     }
 
@@ -296,6 +298,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 0.6f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 0.3);
     }
 
+    int hurtingCooldown = 0;
+
     @Override
     public void tick() {
         super.tick();
@@ -310,8 +314,16 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             }
         }
         if (padrone != null) {
-            if (padrone instanceof PlayerHurtedOrHurtingAccessor ac && modeSullAttenti && ac.caput_mundi$isHurtedOrHurting() && ac.caput_mundi$aquilaTarget() != null) {
-                attacca(ac.caput_mundi$aquilaTarget());
+            if (padrone instanceof PlayerHurtedOrHurtingAccessor ac) {
+                if (modeSullAttenti && ac.caput_mundi$isHurtedOrHurting() && ac.caput_mundi$aquilaTarget() != null) {
+                    attacca(ac.caput_mundi$aquilaTarget());
+                    hurtingCooldown = 0;
+                }
+                if (hurtingCooldown == 200) {
+                    ac.caput_mundi$setHurtedOrHurting(false);
+                    ac.caput_mundi$setAquilaTarget(null);
+                    hurtingCooldown = -1;
+                } else if (hurtingCooldown != -1) hurtingCooldown++;
             }
             if (!level().isClientSide() && level() instanceof ServerLevel serverlvl) {
                 if (startSendVista && tickCounter % serverlvl.getGameRules().get(CaputMundiConstants.AQUILA_VIEW_UPDATE_TICKS) == 0) {
@@ -393,11 +405,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         AABB aabb = new AABB(x - 8, minY, z - 8, x + 8, y, z + 8);
         Map<String, coordsMob> result = new HashMap<>();
         ServerPlayNetworking.send(this.padrone, new LituusPacket("clearplayers", ""));
-        for (Entity entity : level().getEntitiesOfClass(Player.class, aabb)) {
-            Player player = (Player) entity;
+        for (Player entity : level().getEntitiesOfClass(Player.class, aabb)) {
+            Player player = entity;
             coordsMob coords = findCoords(aabb, player.position());
             PlayerDatasPacket packet = new PlayerDatasPacket(player.getStringUUID(), player.getPlainTextName(), player.getHealth(), player.position(), new Vec2((float) coords.x, (float) coords.y));
-          //  IO.println("Packet: " + packet + " mapPos:" + coords.x + "," + coords.y);
+            //  IO.println("Packet: " + packet + " mapPos:" + coords.x + "," + coords.y);
             ServerPlayNetworking.send(this.padrone, packet);
             //      LOGGER.info("Mob:{}, Coords:{}", entity, findCoords(aabb, entity.position()));
         }

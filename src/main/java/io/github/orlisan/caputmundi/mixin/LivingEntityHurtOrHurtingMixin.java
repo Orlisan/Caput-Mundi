@@ -28,6 +28,11 @@ public class LivingEntityHurtOrHurtingMixin implements PlayerHurtedOrHurtingAcce
     }
 
     @Override
+    public void caput_mundi$setHurtedOrHurting(boolean value) {
+        nnhovogliadiriscriverlo = value;
+    }
+
+    @Override
     public LivingEntity caput_mundi$aquilaTarget() {
         return aquilaTarget;
     }
