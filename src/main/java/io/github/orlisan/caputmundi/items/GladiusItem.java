@@ -12,6 +12,6 @@ public class GladiusItem extends Item {
         if((Object) type instanceof SwingAnimationAccessor ac) {
             ac.caput_mundi$setGladius(true);
         }
-        super(props.component(DataComponents.SWING_ANIMATION,  new SwingAnimation(type, 6)));
+        super(props.component(DataComponents.ATTACK_ANIMATION,  new SwingAnimation(type, 6)));
     }
 }

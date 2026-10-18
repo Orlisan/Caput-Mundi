@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
+import org.joml.Matrix4f;
 import org.jspecify.annotations.NonNull;
 
 public  class PilumRenderer extends EntityRenderer<PilumLanciato,PilumRenderState> {
@@ -34,10 +35,10 @@ public  class PilumRenderer extends EntityRenderer<PilumLanciato,PilumRenderStat
     @Override
     public void submit(final PilumRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final @NonNull CameraRenderState camera) {
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0F));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-90.0F));
-        submitNodeCollector.submitModel(this.model, state, poseStack, this.getTextureLocation(), state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor, null);
+        poseStack.mulPose(new Matrix4f().rotateY((float) Math.toDegrees(state.yRot - 90.0F)));
+        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toDegrees(state.xRot)));
+        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toDegrees(-90.0F)));
+        submitNodeCollector.submitModel(this.model, state, poseStack, this.getTextureLocation(), state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
         poseStack.popPose();
         super.submit(state, poseStack, submitNodeCollector, camera);
     }

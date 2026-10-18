@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
 public class PilumLanciato extends AbstractArrow {
@@ -66,7 +67,7 @@ public class PilumLanciato extends AbstractArrow {
             }
             this.discard();
         } else {
-            this.deflect(ProjectileDeflection.REVERSE, entity, this.owner, false);
+            this.deflect(ProjectileDeflection.REVERSE, entity, this.owner, false, new Vec3(0.02, 0.2, 0.02));
             this.setDeltaMovement(this.getDeltaMovement().multiply(0.02, 0.2, 0.02));
         }
         this.playSound(SoundEvents.TRIDENT_HIT, 1.0F, 1.0F);

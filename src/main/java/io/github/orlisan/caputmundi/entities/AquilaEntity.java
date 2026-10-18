@@ -44,7 +44,7 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.spider.Spider;
@@ -54,6 +54,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -259,7 +260,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         this.centroCerchio = BlockPos.containing(location);
                         changedCenter = true;
                         this.setHasCollar(true);
-                        player.swing(hand);
+                        player.swing(hand, SwingAnimation.DEFAULT, false);
                         this.setPersistenceRequired();
                         return InteractionResult.SUCCESS;
                     } else {
@@ -423,7 +424,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             result.put("minecraft:creeper" + mobsCount, findCoords(aabb, entity.position()));
             mobsCount++;
         }
-        for (Entity entity : level().getEntitiesOfClass(EnderMan.class, aabb)) {
+        for (Entity entity : level().getEntitiesOfClass(Enderman.class, aabb)) {
             result.put("minecraft:enderman" + mobsCount, findCoords(aabb, entity.position()));
             mobsCount++;
         }

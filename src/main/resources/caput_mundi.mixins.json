@@ -9,7 +9,6 @@
     "LivingEntityHurtMixin",
     "LivingEntityHurtOrHurtingMixin",
     "PlayerBlockingMixin",
-    "PotionBrewingMixin",
     "SwingAnimationTypeMixin"
   ],
   "injectors": {
