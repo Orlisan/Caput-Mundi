@@ -23,6 +23,11 @@ public class CaputMundiCreativeTab {
                             output.accept(CaputMundiItems.AQUILA_SPAWN_EGG_ITEM);
                             output.accept(CaputMundiItems.AQUILA_ARMOR_ITEM);
                             output.accept(CaputMundiItems.GOLDEN_LAURUS_CROWN);
+                            output.accept(CaputMundiItems.LITUUS_ITEM);
+                            output.accept(CaputMundiItems.PILUM);
+                            output.accept(CaputMundiItems.GLADIUS);
+                            output.accept(CaputMundiItems.PUGIO);
+                            output.accept(CaputMundiItems.IMPERIAL_GOLD_WHEAT);
                         })
                         .build());
     }

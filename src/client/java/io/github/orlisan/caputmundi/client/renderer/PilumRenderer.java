@@ -35,9 +35,9 @@ public  class PilumRenderer extends EntityRenderer<PilumLanciato,PilumRenderStat
     @Override
     public void submit(final PilumRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final @NonNull CameraRenderState camera) {
         poseStack.pushPose();
-        poseStack.mulPose(new Matrix4f().rotateY((float) Math.toDegrees(state.yRot - 90.0F)));
-        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toDegrees(state.xRot)));
-        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toDegrees(-90.0F)));
+        poseStack.mulPose(new Matrix4f().rotateY((float) Math.toRadians(state.yRot - 90.0F)));
+        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toRadians(state.xRot)));
+        poseStack.mulPose(new Matrix4f().rotateZ((float) Math.toRadians(-90.0F)));
         submitNodeCollector.submitModel(this.model, state, poseStack, this.getTextureLocation(), state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
         poseStack.popPose();
         super.submit(state, poseStack, submitNodeCollector, camera);

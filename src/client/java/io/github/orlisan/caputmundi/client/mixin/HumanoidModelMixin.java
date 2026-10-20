@@ -13,18 +13,33 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidModel.class)
-public class HumanoidModelMixin{
+public class HumanoidModelMixin {
     @Shadow
-    public ModelPart getArm(HumanoidArm arm){return null;}
+    public ModelPart getArm(HumanoidArm arm) {
+        return null;
+    }
 
-        @Inject(method="setupAttackAnimation", at=@At("HEAD"))
+    @Inject(method = "setupAttackAnimation", at = @At("HEAD"))
 
-        protected void setupAttackAnimation(final HumanoidRenderState state, CallbackInfo ci) {
-            float attackTime = state.swingAnimation;
-            LivingEntity.SwingDescription currentSwing = state.currentSwing;
-            if (!(attackTime <= 0.0F) && currentSwing != null && (Object) currentSwing.animation().type() instanceof SwingAnimationAccessor ac && ac.caput_mundi$isGladius()) {
+    protected void setupAttackAnimation(final HumanoidRenderState state, CallbackInfo ci) {
+        float attackTime = state.swingAnimation;
+        LivingEntity.SwingDescription currentSwing = state.currentSwing;
+        if (!(attackTime <= 0.0F))
+            if (currentSwing != null) {
                 ModelPart attackArm = this.getArm(state.mainArm);
-                attackArm.xRot += 0.2f;
+                if ((Object) currentSwing.animation() instanceof SwingAnimationAccessor ac)
+                    if (ac.caput_mundi$isGladius()) {
+                        /*1*/
+                        float v = 0.8f;
+                        attackArm.xRot = attackArm.xRot + (
+                                v - attackTime * 2 * v);
+                        //  attackArm.yRot += 2.0F;
+                    } else if (ac.caput_mundi$isPugio()) {
+                 //       float maxAlt = -1f;
+                        int i = 7;
+                        attackArm.xRot = (float) (attackArm.xRot - (attackTime > 0.5 ? (0.5 - (attackTime - 0.5)) * i : attackTime * i));
+
+                    }
             }
     }
 }

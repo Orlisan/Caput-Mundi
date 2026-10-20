@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:brewing",
+  "input": {
+    "item": "minecraft:potion",
+    "potion_contents": {
+      "potions": "minecraft:poison"
+    }
+  },
+  "output": {
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "caput_mundi:laurus_poison"
+      }
+    },
+    "id": "minecraft:potion"
+  },
+  "reagent": {
+    "item": "caput_mundi:laurus_leaves"
+  }
+}

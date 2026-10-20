@@ -9,7 +9,8 @@
     "AvatarRenderMixin",
     "AvatarRenderStateMixin",
     "LayerDefinitionsMixin",
-    "HumanoidModelMixin"
+    "HumanoidModelMixin",
+    "FirstPersonHandsAndItemsRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

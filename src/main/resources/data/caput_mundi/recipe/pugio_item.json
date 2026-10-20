@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    " X "
+  ],
+  "key": {
+    "X": "caput_mundi:imperial_gold_ingot",
+    "O": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "caput_mundi:pugio_item",
+    "count": 1
+  }
+}

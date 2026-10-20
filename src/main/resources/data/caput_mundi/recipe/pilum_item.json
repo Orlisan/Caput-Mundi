@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  O",
+    " X ",
+    "L  "
+  ],
+  "key": {
+    "L": "#minecraft:logs",
+    "X": "caput_mundi:imperial_gold_ingot",
+    "O": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "caput_mundi:pilum_item",
+    "count": 1
+  }
+}

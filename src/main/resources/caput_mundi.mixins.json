@@ -9,7 +9,7 @@
     "LivingEntityHurtMixin",
     "LivingEntityHurtOrHurtingMixin",
     "PlayerBlockingMixin",
-    "SwingAnimationTypeMixin"
+    "SwingAnimationMixin"
   ],
   "injectors": {
     "defaultRequire": 1

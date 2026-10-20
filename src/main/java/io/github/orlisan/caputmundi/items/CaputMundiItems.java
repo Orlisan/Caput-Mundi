@@ -19,9 +19,9 @@ import java.util.function.Function;
 public class CaputMundiItems {
     public static Item LAURUS_LEAF, LAURUS_SEED;
     public static Item LAURUS_CROWN, GOLDEN_LAURUS_CROWN;
-    public static Item IMPERIAL_GOLD_INGOT;
+    public static Item IMPERIAL_GOLD_INGOT, IMPERIAL_GOLD_WHEAT;
     public static Item AQUILA_SPAWN_EGG_ITEM, AQUILA_ARMOR_ITEM, LITUUS_ITEM;
-    public static Item PILUM, GLADIUS;
+    public static Item PILUM, GLADIUS, PUGIO;
 
     private static Item registerItem(String id) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, id);
@@ -58,7 +58,9 @@ public class CaputMundiItems {
         IMPERIAL_GOLD_INGOT = registerItem("imperial_gold_ingot");
         AQUILA_ARMOR_ITEM = registerItem("aquila_armor");
         AQUILA_SPAWN_EGG_ITEM = registerItem("aquila_spawn_egg", SpawnEggItem::new, new Item.Properties().spawnEgg(CaputMundiEntities.AQUILA));
-        PILUM = registerItem("pilum_item", PilumItem::new, new Item.Properties().attributes(PilumItem.createAttributes()).stacksTo(7));
+        PILUM = registerItem("pilum_item", PilumItem::new, new Item.Properties().attributes(PilumItem.createAttributes()).stacksTo(1));
         GLADIUS = registerItem("gladius_item", GladiusItem::new, new Item.Properties());
+        PUGIO = registerItem("pugio_item", PugioItem::new, new Item.Properties());
+        IMPERIAL_GOLD_WHEAT = registerItem("imperial_gold_wheat");
     }
 }

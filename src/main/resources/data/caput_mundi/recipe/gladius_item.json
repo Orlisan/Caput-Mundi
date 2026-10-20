@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    " X ",
+    " O "
+  ],
+  "key": {
+    "O": "caput_mundi:imperial_gold_ingot",
+    "X": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "caput_mundi:gladius_item",
+    "count": 1
+  }
+}
