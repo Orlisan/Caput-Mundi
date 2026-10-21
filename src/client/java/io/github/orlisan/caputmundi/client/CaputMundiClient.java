@@ -4,6 +4,7 @@ import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.client.gui.LituusScreen;
 import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
 import io.github.orlisan.caputmundi.client.renderer.PilumRenderer;
+import io.github.orlisan.caputmundi.client.renderer.PlumbataRenderer;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import io.github.orlisan.caputmundi.gui.CaputMundiMenuTypes;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -83,6 +84,10 @@ public class CaputMundiClient implements ClientModInitializer {
         EntityRenderers.register(
                 CaputMundiEntities.PILUM,
                 PilumRenderer::new
+        );
+        EntityRenderers.register(
+                CaputMundiEntities.PLUMBATA,
+                PlumbataRenderer::new
         );
         //Builder per aggirare il voluto final delle lambda
         ClientPlayConnectionEvents.JOIN.register((_, _, client) -> {

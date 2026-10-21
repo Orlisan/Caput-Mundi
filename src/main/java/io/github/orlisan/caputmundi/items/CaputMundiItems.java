@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 
@@ -21,7 +22,7 @@ public class CaputMundiItems {
     public static Item LAURUS_CROWN, GOLDEN_LAURUS_CROWN;
     public static Item IMPERIAL_GOLD_INGOT, IMPERIAL_GOLD_WHEAT;
     public static Item AQUILA_SPAWN_EGG_ITEM, AQUILA_ARMOR_ITEM, LITUUS_ITEM;
-    public static Item PILUM, GLADIUS, PUGIO;
+    public static Item PILUM, GLADIUS, PUGIO, PLUMBATA, SCUTUM;
 
     private static Item registerItem(String id) {
         Identifier identifier = Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, id);
@@ -62,5 +63,7 @@ public class CaputMundiItems {
         GLADIUS = registerItem("gladius_item", GladiusItem::new, new Item.Properties());
         PUGIO = registerItem("pugio_item", PugioItem::new, new Item.Properties());
         IMPERIAL_GOLD_WHEAT = registerItem("imperial_gold_wheat");
+        PLUMBATA = registerItem("plumbata_item", PlumbataItem::new, new Item.Properties());
+        SCUTUM = registerItem("scutum_item", ShieldItem::new, new Item.Properties());
     }
 }

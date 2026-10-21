@@ -30,13 +30,18 @@ public class CaputMundiEntities {
             EntityType.Builder.<PilumLanciato>of(PilumLanciato::new, MobCategory.MISC).noLootTable().sized(0.5F, 0.5F).eyeHeight(0.13F).clientTrackingRange(4).updateInterval(20)
     );
 
+    public static final EntityType<@NotNull PlumbataLanciata> PLUMBATA = register(
+            Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "plumbata"),
+            EntityType.Builder.<PlumbataLanciata>of(PlumbataLanciata::new, MobCategory.MISC).noLootTable().sized(0.5F, 0.5F).eyeHeight(0.13F).clientTrackingRange(4).updateInterval(20)
+    );
+
 
 
     private static ResourceKey<EntityType<?>> keyOf(String name) {
         return ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, name));
     }
 
-    private static  EntityType<@NotNull PilumLanciato> register(final Identifier id, final EntityType.Builder<PilumLanciato> builder) {
+    private static <T extends Entity> EntityType<@NotNull T > register(final Identifier id, final EntityType.Builder<T> builder) {
         return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
     }
 

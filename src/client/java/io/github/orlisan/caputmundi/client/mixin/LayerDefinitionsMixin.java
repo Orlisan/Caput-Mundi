@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.github.orlisan.caputmundi.client.model.CaputMundiModelLayers;
 import io.github.orlisan.caputmundi.client.model.PilumModel;
+import io.github.orlisan.caputmundi.client.model.PlumbataModel;
 import net.minecraft.client.model.geom.LayerDefinitions;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -19,6 +20,7 @@ public class LayerDefinitionsMixin {
     @Inject(method = "createRoots", at = @At("RETURN"), cancellable = true)
     private static void addPilumLayerDef(CallbackInfoReturnable<Map<ModelLayerLocation, LayerDefinition>> cir, @Local(name = "result") ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> result) {
         result.put(CaputMundiModelLayers.PILUM, PilumModel.createBodyLayer());
+        result.put(CaputMundiModelLayers.PLUMBATA, PlumbataModel.createBodyLayer());
         cir.setReturnValue(result.build());
     }
 }

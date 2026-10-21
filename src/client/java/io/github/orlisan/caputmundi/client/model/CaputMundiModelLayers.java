@@ -28,4 +28,5 @@ public class CaputMundiModelLayers {
     }
 
     public static final ModelLayerLocation PILUM = register("pilum");
+    public static final ModelLayerLocation PLUMBATA = register("plumbata");
 }
