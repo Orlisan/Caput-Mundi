@@ -95,8 +95,5 @@ public class PilumItem extends Item implements ProjectileItem {
     public int getUseDuration(final ItemStack itemStack, final LivingEntity user) {
         return 72000;
     }
-    public static Tool createToolProperties() {
-        return new Tool(List.of(), 1.0F, 2, false);
-    }
 
 }

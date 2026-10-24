@@ -1,20 +1,32 @@
 package io.github.orlisan.caputmundi.items;
 
+import com.mojang.serialization.Codec;
 import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.references.ItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class CaputMundiItems {
@@ -50,6 +62,13 @@ public class CaputMundiItems {
         return Registry.register(BuiltInRegistries.ITEM, key, item);
     }
 
+    public static final DataComponentType<Integer> PLUMBATA_COUNT =
+            Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
+                    Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "plumbata_count"),
+                    DataComponentType.<Integer>builder().persistent(Codec.INT)
+                            .networkSynchronized(ByteBufCodecs.VAR_INT).build());
+
+
     public static void register() {
         LAURUS_LEAF = registerItem("laurus_leaves");
         LAURUS_SEED = registerBlockItem("laurus_seed", CaputMundiBlocks.LAURUS_CROP);
@@ -64,6 +83,13 @@ public class CaputMundiItems {
         PUGIO = registerItem("pugio_item", PugioItem::new, new Item.Properties());
         IMPERIAL_GOLD_WHEAT = registerItem("imperial_gold_wheat");
         PLUMBATA = registerItem("plumbata_item", PlumbataItem::new, new Item.Properties());
-        SCUTUM = registerItem("scutum_item", ShieldItem::new, new Item.Properties());
+        //SCUTUM = registerItem("scutum_item", ShieldItem::new, new Item.Properties());
+        SCUTUM = registerItem("scutum_item", ScutumItem::new, (new Item.Properties()).durability(436).repairable(ItemTags.WOODEN_TOOL_MATERIALS)
+                .equippableUnswappable(EquipmentSlot.OFFHAND).delayedComponent(DataComponents.BLOCKS_ATTACKS, (context) ->
+                        new BlocksAttacks(0.35F, 1.0F, List.of(new BlocksAttacks.DamageReduction(135.0F, Optional.empty(),
+                                0.0F, 1.0F)), new BlocksAttacks.ItemDamageFunction(3.5F, 1.0F, 1.0F),
+                                Optional.of(context.getOrThrow(DamageTypeTags.BYPASSES_SHIELD)), Optional.of(SoundEvents.SHIELD_BLOCK),
+                                Optional.of(SoundEvents.SHIELD_BREAK))).component(DataComponents.BREAK_SOUND, SoundEvents.SHIELD_BREAK));
+
     }
 }

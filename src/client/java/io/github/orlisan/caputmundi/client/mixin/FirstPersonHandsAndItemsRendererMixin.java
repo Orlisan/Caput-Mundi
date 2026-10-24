@@ -22,15 +22,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class FirstPersonHandsAndItemsRendererMixin {
     @Inject(at = @At("HEAD"), method = "submitArmWithItem")
     public void addaAnimazioniPrimaPersonaRomane(PlayerRenderState playerState, FirstPersonHandsAndItemsRenderState state, float partialTicks, float xRot, InteractionHand hand, float attackTime, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
+        poseStack.pushPose();
         if (!state.isScoping) {
             AvatarRenderState avatarRenderState = playerState.avatarRenderState;
-            poseStack.pushPose();
             if (avatarRenderState != null && !itemStack.has(DataComponents.MAP_ID)
                 && (!avatarRenderState.isUsingItem || !(state.useItemRemainingTicks > 0) || !(avatarRenderState.useItemHand == hand)) && !avatarRenderState.isAutoSpinAttack && attackTime > 0) {
                 if (itemStack.is(CaputMundiItems.GLADIUS)) {
                     //    float ySwingPosition = 0.2F * Mth.sin(Mth.sqrt(attackTime) * ((float)Math.PI * 2F));
                     //     poseStack.translate(2*attackTime, ySwingPosition, 0);
                     poseStack.rotateDegrees(Axis.XP, -30 - attackTime * 60);
+                    int max = 35;
+                    poseStack.translate(0, attackTime > 0.5? max*(0.5-attackTime)*2: max*attackTime*2, 0);
                     //  poseStack.rotate(Axis.XN, -30);
                   //     applyItemArmAttackTransform(poseStack, arm, attackTime);
                 }else if(itemStack.is(CaputMundiItems.PUGIO)) {

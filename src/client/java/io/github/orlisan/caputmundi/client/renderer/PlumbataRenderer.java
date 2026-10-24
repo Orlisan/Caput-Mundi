@@ -46,7 +46,7 @@ public  class PlumbataRenderer extends EntityRenderer<PlumbataLanciata,PilumRend
     @Override
     public void extractRenderState(@NonNull PlumbataLanciata entity, @NonNull PilumRenderState state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
-        state.xRot = entity.getXRot(partialTicks);
+        state.xRot = entity.getXRot(partialTicks)+180;
         state.yRot = entity.getYRot(partialTicks);
     }
 }
