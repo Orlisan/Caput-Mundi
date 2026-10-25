@@ -68,6 +68,12 @@ public class CaputMundiItems {
                     DataComponentType.<Integer>builder().persistent(Codec.INT)
                             .networkSynchronized(ByteBufCodecs.VAR_INT).build());
 
+    public static final DataComponentType<Integer> SCUTUM_COLOR =
+            Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE,
+                    Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "scutum_color"),
+                    DataComponentType.<Integer>builder().persistent(Codec.INT)
+                            .networkSynchronized(ByteBufCodecs.VAR_INT).build());
+
 
     public static void register() {
         LAURUS_LEAF = registerItem("laurus_leaves");

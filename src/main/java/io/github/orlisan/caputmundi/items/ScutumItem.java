@@ -14,12 +14,13 @@ import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 
 import static io.github.orlisan.caputmundi.items.PlumbataItem.VELOCITA_DI_PARTENZA;
 
-public class ScutumItem extends Item {
+public class ScutumItem extends ShieldItem {
     public ScutumItem(Properties props) {
         super(props);
     }

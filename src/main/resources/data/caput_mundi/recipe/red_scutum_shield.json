@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "XDX",
+    " O ",
+    "XSX"
+  ],
+  "key": {
+    "O": "caput_mundi:imperial_gold_ingot",
+    "X": "minecraft:iron_ingot",
+    "D": "minecraft:red_dye",
+    "S": "minecraft:shield"
+  },
+  "result": {
+    "id": "caput_mundi:gladius_item",
+    "count": 1,
+    "components": {
+      "caput_mundi:scutum_color": 0
+    }
+  }
+}

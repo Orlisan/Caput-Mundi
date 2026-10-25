@@ -1,9 +1,5 @@
 {
-  "parent": "caput_mundi:item/scutum_item",
-  "gui_light": "front",
-  "textures": {
-    "particle": "block/dark_oak_planks"
-  },
+  "parent": "caput_mundi:item/scutum/plumbata_scutum_4",
   "display": {
     "thirdperson_righthand": {
       "rotation": [ 36, -120, 0 ],
@@ -17,12 +13,12 @@
     },
     "firstperson_righthand": {
       "rotation": [ 0, -90, 0 ],
-      "translation": [ -5, -6, -3.9 ],
+      "translation": [ -5, -11, -3.9 ],
       "scale": [ 1, 1, 1 ]
     },
     "firstperson_lefthand": {
       "rotation": [ 0, 90, 0 ],
-      "translation": [ -5, -6, -3.9 ],
+      "translation": [ -5, -11, -3.9 ],
       "scale": [ 1, 1, 1 ]
     }
   }

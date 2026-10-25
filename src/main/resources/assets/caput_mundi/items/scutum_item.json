@@ -3,34 +3,37 @@
     "type": "minecraft:composite",
     "models": [
       {
-        "type": "minecraft:condition",
-        "property": "minecraft:using_item",
-        "on_false": {
-          "type": "minecraft:model",
-          "model": "caput_mundi:item/scutum_item"
-        },
-        "on_true": {
-          "type": "minecraft:model",
-          "model": "caput_mundi:item/scutum_item_blocking"
-        }
-      },
-      {
         "type": "minecraft:select",
         "property": "minecraft:component",
-        "component": "caput_mundi:plumbata_count",
+        "component": "caput_mundi:scutum_color",
         "cases": [
           {
-            "when": 1,
-            "model":{
+            "when": 0,
+            "model": {
               "type": "minecraft:condition",
               "property": "minecraft:using_item",
               "on_false": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_1"
+                "model": "caput_mundi:item/scutum/scutum_item_base_red"
               },
               "on_true": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_1_blocking"
+                "model": "caput_mundi:item/scutum/scutum_item_blocking_base_red"
+              }
+            }
+          },
+          {
+            "when": 1,
+            "model": {
+              "type": "minecraft:condition",
+              "property": "minecraft:using_item",
+              "on_false": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/scutum_item_orange"
+              },
+              "on_true": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/scutum_item_blocking_orange"
               }
             }
           },
@@ -41,11 +44,11 @@
               "property": "minecraft:using_item",
               "on_false": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_2"
+                "model": "caput_mundi:item/scutum/scutum_item_blue"
               },
               "on_true": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_2_blocking"
+                "model": "caput_mundi:item/scutum/scutum_item_blocking_blue"
               }
             }
           },
@@ -56,11 +59,75 @@
               "property": "minecraft:using_item",
               "on_false": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_3"
+                "model": "caput_mundi:item/scutum/scutum_item_green"
               },
               "on_true": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_3_blocking"
+                "model": "caput_mundi:item/scutum/scutum_item_blocking_green"
+              }
+            }
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:condition",
+          "property": "minecraft:using_item",
+          "on_false": {
+            "type": "minecraft:model",
+            "model": "caput_mundi:item/scutum/scutum_item_base_red"
+          },
+          "on_true": {
+            "type": "minecraft:model",
+            "model": "caput_mundi:item/scutum/scutum_item_blocking_base_red"
+          }
+        }
+      },
+      {
+        "type": "minecraft:select",
+        "property": "minecraft:component",
+        "component": "caput_mundi:plumbata_count",
+        "cases": [
+          {
+            "when": 1,
+            "model": {
+              "type": "minecraft:condition",
+              "property": "minecraft:using_item",
+              "on_false": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_1"
+              },
+              "on_true": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_1_blocking"
+              }
+            }
+          },
+          {
+            "when": 2,
+            "model": {
+              "type": "minecraft:condition",
+              "property": "minecraft:using_item",
+              "on_false": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_2"
+              },
+              "on_true": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_2_blocking"
+              }
+            }
+          },
+          {
+            "when": 3,
+            "model": {
+              "type": "minecraft:condition",
+              "property": "minecraft:using_item",
+              "on_false": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_3"
+              },
+              "on_true": {
+                "type": "minecraft:model",
+                "model": "caput_mundi:item/scutum/plumbata_scutum_3_blocking"
               }
             }
           },
@@ -71,11 +138,11 @@
               "property": "minecraft:using_item",
               "on_false": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_4"
+                "model": "caput_mundi:item/scutum/plumbata_scutum_4"
               },
               "on_true": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_4_blocking"
+                "model": "caput_mundi:item/scutum/plumbata_scutum_4_blocking"
               }
             }
           },
@@ -86,16 +153,18 @@
               "property": "minecraft:using_item",
               "on_false": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_5"
+                "model": "caput_mundi:item/scutum/plumbata_scutum_5"
               },
               "on_true": {
                 "type": "minecraft:model",
-                "model": "caput_mundi:item/plumbata_scutum_5_blocking"
+                "model": "caput_mundi:item/scutum/plumbata_scutum_5_blocking"
               }
             }
           }
         ],
-        "fallback": {"type": "minecraft:empty"}
+        "fallback": {
+          "type": "minecraft:empty"
+        }
       }
     ]
   }

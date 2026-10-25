@@ -37,7 +37,8 @@ public abstract class HumanoidModelMixin {
     void poseRightBraccio(HumanoidRenderState state, CallbackInfo ci) {
         //Muove l'altro braccio
         if (((ArmPoseAccessor) state).caput_mundi$isScutumLeft()) {
-            this.rightArm.zRot = (float) rad(60);
+            this.rightArm.zRot = (float) rad(-10);
+            this.rightArm.xRot = (float) rad(15);
         }/*else if(((ArmPoseAccessor) state).caput_mundi$isScutumLeft()) {
             //Posa tridente
             this.rightArm.xRot = this.rightArm.xRot * 0.5F - (float)Math.PI;
@@ -54,7 +55,8 @@ public abstract class HumanoidModelMixin {
     void poseLeftBraccio(HumanoidRenderState state, CallbackInfo ci) {
         //Muove l'altro braccio
         if (((ArmPoseAccessor) state).caput_mundi$isScutumRight()) {
-            this.leftArm.zRot = (float) rad(-60);
+            this.leftArm.zRot = (float) rad(10);
+            this.leftArm.xRot = (float) rad(-15);
         }/*else if(((ArmPoseAccessor) state).caput_mundi$isScutumLeft()) {
             //Posa tqridente
             this.leftArm.xRot = this.leftArm.xRot * 0.5F - (float)Math.PI;

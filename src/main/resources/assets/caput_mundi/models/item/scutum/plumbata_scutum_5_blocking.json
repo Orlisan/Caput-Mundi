@@ -1,5 +1,5 @@
 {
-  "parent": "caput_mundi:item/plumbata_scutum_1",
+  "parent": "caput_mundi:item/scutum/plumbata_scutum_5",
   "display": {
     "thirdperson_righthand": {
       "rotation": [ 36, -120, 0 ],

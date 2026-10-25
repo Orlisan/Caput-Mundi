@@ -1,0 +1,7 @@
+{
+  "parent": "caput_mundi:item/scutum/scutum_item_base_red",
+  "textures": {
+    "0": "caput_mundi:item/scutum_item_green",
+    "particle": "caput_mundi:item/scutum_item_green"
+  }
+}

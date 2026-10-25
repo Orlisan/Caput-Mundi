@@ -1,5 +1,9 @@
 {
-  "parent": "caput_mundi:item/plumbata_scutum_3",
+  "parent": "caput_mundi:item/scutum/scutum_item_base_red",
+  "gui_light": "front",
+  "textures": {
+    "particle": "block/dark_oak_planks"
+  },
   "display": {
     "thirdperson_righthand": {
       "rotation": [ 36, -120, 0 ],

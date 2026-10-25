@@ -28,6 +28,8 @@ public class CaputMundiCreativeTab {
                             output.accept(CaputMundiItems.GLADIUS);
                             output.accept(CaputMundiItems.PUGIO);
                             output.accept(CaputMundiItems.IMPERIAL_GOLD_WHEAT);
+                            output.accept(CaputMundiItems.PLUMBATA);
+                            output.accept(CaputMundiItems.SCUTUM);
                         })
                         .build());
     }

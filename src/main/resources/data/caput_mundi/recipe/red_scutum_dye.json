@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:red_dye",
+    "caput_mundi:scutum_item"
+  ],
+  "result": {
+    "id": "caput_mundi:scutum_item",
+    "components": {
+      "caput_mundi:scutum_color": 0
+    }
+  }
+}
