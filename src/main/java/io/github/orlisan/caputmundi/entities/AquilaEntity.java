@@ -118,8 +118,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public void startGoToPlayer(ServerPlayer playerToSpy) {
         if (isFlying) this.playerToSpy = playerToSpy;
         else {
-            this.playerToSpyDopo = playerToSpy;
             startDecollo();
+            this.playerToSpyDopo = playerToSpy;
             cosaDaFare = ThingsToDoAfterDecollo.MOVETOPLAYER;
         }
     }
@@ -249,7 +249,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
             if (stack.getItem() == ADDOMESTICATION_ITEM) {
                 if (this.padrone == null) {
                     if (!player.isCreative())
-                        player.setItemInHand(hand, new ItemStack(stack.getItem(), stack.getCount() - 1));
+                        player.getItemInHand(hand).shrink(1);
                     if (Math.random() < 0.3d) {
                         //       LOGGER.info("Passato random");
                         this.padrone = (ServerPlayer) player;
@@ -265,8 +265,10 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                         return InteractionResult.SUCCESS;
                     } else {
                         RandomSource random = RandomSource.create();
-                        for (int i = 0; i < 6; i++) {
-                            level().addParticle(ParticleTypes.ASH, this.position().x + random.nextInt(-1, 1), this.position().y + random.nextInt(-1, 1), this.position().z + random.nextInt(-1, 1), 0, 0, 0);
+                        if (level() instanceof ServerLevel serverLevel) {
+                            serverLevel.sendParticles(ParticleTypes.ASH,
+                                    getX(), getY() + 0.5, getZ(),
+                                    6, 0.5, 0.5, 0.5, 0.0);
                         }
                     }
                     //     LOGGER.info("Non passato random");
@@ -308,6 +310,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
      /*   if (!startDecollo && !distanceAttack && !vicinoAttack) {
             startRuotaInCerchio();
         }*/
+        if(padrone != null && padrone.isRemoved()) padrone = null;
         if (padrone == null && !padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
             var padronenullable = level().getPlayerByUUID(UUID.fromString(padroneStringUUID));
             if (padronenullable instanceof ServerPlayer serverPlayer) {
@@ -369,17 +372,17 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         super.readAdditionalSaveData(input);
         if (input.getBooleanOr("eNata", false)) {
             this.isFlying = input.getBooleanOr("isFlying", false);
-            if (isFlying) {
+            this.startRuotaInCerchio();
+           /* if (isFlying) {
                 this.setStartDecolloAnim(true);
             } else {
                 this.setStartAtterraggioAnim(true);
-            }
+            }*/
             this.setHasArmor(input.getBooleanOr("hasArmor", false));
             this.padroneStringUUID = input.getStringOr("padroneUUID", CaputMundiConstants.NULLID);
             if (!padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
                 this.setHasCollar(true);
             }
-            this.startRuotaInCerchio();
         }
     }
 
@@ -390,7 +393,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         int minY = Integer.MAX_VALUE;
         for (int x = posX - 8; x < posX + 8; x++) {
             for (int z = posZ - 8; z < posZ + 8; z++) {
-                for (int i = posY; i > -64; i--) {
+                for (int i = posY; i > level().getMinY(); i--) {
                     BlockPos pos = new BlockPos(x, i, z);
                     if (!level().isEmptyBlock(pos)) {
                         if (i < minY) minY = i;
@@ -464,7 +467,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         int posZ = (int) Math.floor(position().z());
         for (int x = posX - 8; x < posX + 8; x++) {
             for (int z = posZ - 8; z < posZ + 8; z++) {
-                for (int i = posY; i > -64; i--) {
+                for (int i = posY; i > level().getMinY(); i--) {
                     BlockPos pos = new BlockPos(x, i, z);
                     if (!level().isEmptyBlock(pos)) {
                         BlockState blockState = level().getBlockState(pos);
@@ -538,9 +541,9 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>("movement", 0, state -> {
+        controllerRegistrar.add(new AnimationController<>("movement", 0, _ -> PlayState.STOP)
 
-            if (getStartDecolloAnim()) {
+            /*if (getStartDecolloAnim()) {
                 //     (logPoint:"Voglio Decollare: atterraggioAnim"+getStartAtterraggioAnim() )
                 //  IO.println("Voglio Decollare: atterraggioAnim" + getStartAtterraggioAnim());
                 state.setAnimation(
@@ -558,8 +561,8 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                 setStartAtterraggioAnim(false);
                 ClientPlayNetworking.send(new LituusPacket("setfalse:atterraggio", this.stringUUID));
             }
-            return PlayState.CONTINUE;
-        }));
+            return PlayState.CONTINUE;*/
+        ));
     }
 
     @Override
