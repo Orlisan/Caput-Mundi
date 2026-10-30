@@ -41,13 +41,14 @@ public class LivingEntityHurtOrHurtingMixin implements PlayerHurtedOrHurtingAcce
     public void settaFlag(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<?> cir) {
         if (cir.getReturnValueZ() && source.getEntity() instanceof LivingEntity livingEntity) {
             caput_mundi$setAquilaTarget(livingEntity);
+            ((PlayerHurtedOrHurtingAccessor) livingEntity).caput_mundi$setAquilaTarget((LivingEntity) (Object) this);
         }
     }
 
-    @Inject(method = "doHurtTarget", at = @At("RETURN"))
+  /*  @Inject(method = "doHurtTarget", at = @At("RETURN"))
     public void settaFlag2(ServerLevel level, Entity target, CallbackInfoReturnable<?> cir) {
         if (target instanceof LivingEntity entity) {
             caput_mundi$setAquilaTarget(entity);
         }
-    }
+    }*/
 }

@@ -64,6 +64,7 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
 
     boolean isSpying = false;
     boolean isAttacking = false;
+    boolean isAttenta = false;
     LituusEditBox playerTargetEditBox;
     LituusEditBox playerTargetEditBoxAttack;
     LituusEditBox XeditBox;
@@ -73,6 +74,7 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
     LituusButton spyButton;
 
     LituusButton attackButton;
+    LituusButton attentaButton;
     LituusButton overviewModeButton;
     LituusButton spyModeButton;
     LituusButton richiamaButton;
@@ -86,6 +88,7 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
 
         spyButton.visible = false;
         attackButton.visible = false;
+        attentaButton.visible = false;
         playerTargetEditBox.visible = false;
         playerTargetEditBoxAttack.visible = false;
         XeditBox.visible = false;
@@ -120,6 +123,7 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
             moveButton.visible = true;
         } else if (mode == LituusMode.ATTACK) {
             attackButton.visible = true;
+            attentaButton.visible = true;
             playerTargetEditBoxAttack.setVisible(true);
             this.setFocused(playerTargetEditBoxAttack)
             ;
@@ -188,6 +192,13 @@ public class LituusScreen extends AbstractContainerScreen<LituusMenu> {
                 isAttacking = !isAttacking;
             }
         }, leftPos + imageWidth / 4, topPos + imageHeight / 2, 50, 25, CaputMundiClient.ZOMBIE_SPRITE, 8, 8, 8, 8));
+        attentaButton = addRenderableWidget(new LituusButton(() -> {
+            if (this.getMode() != LituusMode.ATTACK) return;
+            if (minecraft.player != null) {
+                isAttenta = !isAttenta;
+                sendCommand("attenta:"+(isAttenta?"si":"no"));
+            }
+        }, leftPos + imageWidth / 2, topPos + imageHeight / 2, 50, 25, CaputMundiClient.CAVE_SPIDER_SPRITE, 8, 8, 8, 8));
 
         richiamaButton = addRenderableWidget(new LituusButton(() -> {
             if (this.getMode() != LituusMode.OVERVIEW) return;

@@ -15,7 +15,6 @@ import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
 import io.github.orlisan.caputmundi.packets.AquilaVistaPacket;
 import io.github.orlisan.caputmundi.packets.LituusPacket;
 import io.github.orlisan.caputmundi.packets.PlayerDatasPacket;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -72,6 +71,10 @@ import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
 @SuppressWarnings("NullableProblems")
 public class AquilaEntity extends PathfinderMob implements GeoEntity {
+    public static final RawAnimation DECOLLO_ANIM = RawAnimation.begin()
+            .thenPlay("animazione_decollo").thenLoop("animazione_volo");
+    public static final RawAnimation ANIMAZIONE_ATTERRAGGIO = RawAnimation.begin()
+            .thenPlayAndHold("animazione_atterraggio");
     private final AnimatableInstanceCache cache =
             GeckoLibUtil.createInstanceCache(this);
     public boolean isFlying = true;
@@ -96,17 +99,14 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
         var ret = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
-        eNata = true;
         startDecollo();
+        cosaDaFare = ThingsToDoAfterDecollo.RUOTAINCERCHIO;
         return ret;
     }
 
-    private static final EntityDataAccessor<Boolean> STARTATTERRAGGIO =
+    private static final EntityDataAccessor<Boolean> VOLA =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
-
-    private static final EntityDataAccessor<Boolean> STARTDECOLLO =
-            SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
-    public ThingsToDoAfterDecollo cosaDaFare = ThingsToDoAfterDecollo.RUOTAINCERCHIO;
+    public ThingsToDoAfterDecollo cosaDaFare;
 
 
     public enum ThingsToDoAfterDecollo {
@@ -125,19 +125,19 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public void setStartAtterraggioAnim(boolean flag) {
-        this.entityData.set(STARTATTERRAGGIO, flag);
+        if (flag) this.entityData.set(VOLA, false);
     }
 
     public boolean getStartAtterraggioAnim() {
-        return this.entityData.get(STARTATTERRAGGIO);
+        return !this.entityData.get(VOLA);
     }
 
     public void setStartDecolloAnim(boolean flag) {
-        this.entityData.set(STARTDECOLLO, flag);
+        if (flag) this.entityData.set(VOLA, true);
     }
 
     public boolean getStartDecolloAnim() {
-        return this.entityData.get(STARTDECOLLO);
+        return this.entityData.get(VOLA);
     }
 
     private static final EntityDataAccessor<Boolean> HAS_ARMOR =
@@ -168,7 +168,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     public void attacca(LivingEntity entity) {
         if (this.distanceTo(entity) < 3.0f) {
-            if(!isFlying) {
+            if (!isFlying) {
                 isFlying = true;
                 this.setStartDecolloAnim(true);
             }
@@ -184,8 +184,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         super.defineSynchedData(entityData);
         entityData.define(HAS_COLLAR, false);
         entityData.define(HAS_ARMOR, false);
-        entityData.define(STARTATTERRAGGIO, false);
-        entityData.define(STARTDECOLLO, false);
+        entityData.define(VOLA, false);
     }
 
     public ItemStack lituus;
@@ -216,13 +215,17 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     public ServerPlayer padrone = null;
     public String padroneStringUUID = CaputMundiConstants.NULLID;
+    public String playerToSpyStringUUID = CaputMundiConstants.NULLID;
 
     public static final double DURATA_VOLO = 2.5;
 
     public void spyPlayer(String playerName) {
         if (this.padrone != null) {
             for (ServerPlayer p : this.padrone.level().players()) {
-                if (p.getName().getString().equals(playerName)) startGoToPlayer(p);
+                if (p.getName().getString().equals(playerName)) {
+                    playerToSpyStringUUID = p.getStringUUID();
+                    startGoToPlayer(p);
+                }
             }
         }
     }
@@ -298,7 +301,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 0.6f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 0.3);
+        return Mob.createMobAttributes().add(Attributes.FLYING_SPEED, 0.6f).add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 0.3).add(Attributes.TEMPT_RANGE, 27);
     }
 
     int hurtingCooldown = 0;
@@ -310,11 +313,17 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
      /*   if (!startDecollo && !distanceAttack && !vicinoAttack) {
             startRuotaInCerchio();
         }*/
-        if(padrone != null && padrone.isRemoved()) padrone = null;
+        if (padrone != null && padrone.isRemoved()) padrone = null;
         if (padrone == null && !padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
             var padronenullable = level().getPlayerByUUID(UUID.fromString(padroneStringUUID));
             if (padronenullable instanceof ServerPlayer serverPlayer) {
                 padrone = serverPlayer;
+            }
+        }
+        if (playerToSpy == null && !playerToSpyStringUUID.equals(CaputMundiConstants.NULLID)) {
+            var playerNullable = level().getPlayerByUUID(UUID.fromString(playerToSpyStringUUID));
+            if (playerNullable instanceof ServerPlayer serverPlayer) {
+                playerToSpy = serverPlayer;
             }
         }
         if (padrone != null) {
@@ -363,25 +372,36 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         super.addAdditionalSaveData(output);
         output.putBoolean("isFlying", isFlying);
         output.putString("padroneUUID", padroneStringUUID);
-        output.putBoolean("eNata", eNata);
         output.putBoolean("hasArmor", hasArmor());
+        output.putString("goal", startDecollo ? "decollo" : ruotaInCerchio ?
+                "ruota" : modeSullAttenti ? "attenti" : distanceAttack || vicinoAttack ? "attack"
+                : playerToSpy != null ? "playerToSpyUUID:" +
+                                        playerToSpy.getStringUUID() : coordsToMove != NO_MOVES ? "moves:" +
+                                                                                                 coordsToMove.x + ":" + coordsToMove.y + ":" + coordsToMove.x : "NO_GOAL"
+        );
     }
 
     @Override
     protected void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
-        if (input.getBooleanOr("eNata", false)) {
-            this.isFlying = input.getBooleanOr("isFlying", false);
-            this.startRuotaInCerchio();
-           /* if (isFlying) {
-                this.setStartDecolloAnim(true);
-            } else {
-                this.setStartAtterraggioAnim(true);
-            }*/
-            this.setHasArmor(input.getBooleanOr("hasArmor", false));
-            this.padroneStringUUID = input.getStringOr("padroneUUID", CaputMundiConstants.NULLID);
-            if (!padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
-                this.setHasCollar(true);
+        this.isFlying = input.getBooleanOr("isFlying", false);
+        this.setHasArmor(input.getBooleanOr("hasArmor", false));
+        this.padroneStringUUID = input.getStringOr("padroneUUID", CaputMundiConstants.NULLID);
+        if (!padroneStringUUID.equals(CaputMundiConstants.NULLID)) {
+            this.setHasCollar(true);
+        }
+        String goal = input.getStringOr("goal", "NO_GOAL");
+        if (goal.equals("decollo"))  {startDecollo(); cosaDaFare = ThingsToDoAfterDecollo.RUOTAINCERCHIO;}
+        if (goal.equals("ruota")) startRuotaInCerchio();
+        if (goal.equals("attack")) attacca(getTarget());
+        if (goal.equals("attenti")) modeSullAttenti = true;
+        if (goal.startsWith("playerToSpyUUID")) this.playerToSpyStringUUID = goal.split(":")[1];
+        if (goal.startsWith("moves")) {
+            var split = goal.split(":");
+            try {
+                this.coordsToMove = new Vec3(Double.parseDouble(split[1]), Double.parseDouble(split[2]), Double.parseDouble(split[3]));
+            } catch (NumberFormatException e) {
+                IO.println("Invalid coord: " + Arrays.toString(split));
             }
         }
     }
@@ -500,7 +520,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     public void startAttaccoADistanza() {
         if (isFlying) {
             this.distanceAttack = true;
-            this.setStartAtterraggioAnim(true);
+        //    this.setStartAtterraggioAnim(true);
         } else {
             startDecollo();
             cosaDaFare = ThingsToDoAfterDecollo.ATTACKDISTANZA;
@@ -541,28 +561,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>("movement", 0, _ -> PlayState.STOP)
+        controllerRegistrar.add(new AnimationController<>("movement", 0, state -> {
 
-            /*if (getStartDecolloAnim()) {
-                //     (logPoint:"Voglio Decollare: atterraggioAnim"+getStartAtterraggioAnim() )
-                //  IO.println("Voglio Decollare: atterraggioAnim" + getStartAtterraggioAnim());
-                state.setAnimation(
-                        RawAnimation.begin()
-                                .thenPlay("animazione_decollo").thenLoop("animazione_volo"));
-                setStartDecolloAnim(false);
-                ClientPlayNetworking.send(new LituusPacket("setfalse:decollo", this.stringUUID));
-                //  IO.println("Decollato: decolloAnim: " + getStartDecolloAnim() + "atterraggio:" + getStartAtterraggioAnim());
-                //(logPoint: "Decollato: decolloAnim: "+getStartDecolloAnim()+"atterraggio:"+getStartAtterraggioAnim())
-            } else if (getStartAtterraggioAnim()) {
-                state.setAnimation(
-                        RawAnimation.begin()
-                                .thenPlayAndHold("animazione_atterraggio")
-                );
-                setStartAtterraggioAnim(false);
-                ClientPlayNetworking.send(new LituusPacket("setfalse:atterraggio", this.stringUUID));
-            }
-            return PlayState.CONTINUE;*/
-        ));
+            state.setAnimation(getStartDecolloAnim() ? DECOLLO_ANIM : ANIMAZIONE_ATTERRAGGIO);
+            return PlayState.CONTINUE;
+        }));
     }
 
     @Override
@@ -579,6 +582,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         this.goalSelector.addGoal(2, new GoToPlayerGoal(this));
         this.goalSelector.addGoal(3, new RichiamaGoal(this));
         this.goalSelector.addGoal(4, new DecolloGoal(this));
+        this.goalSelector.addGoal(5, new AquilaTemptGoal(this, 2.5, (item) -> item.getItem() == ADDOMESTICATION_ITEM, false));
         this.goalSelector.addGoal(5, new RuotaInCerchioGoal(this));
         this.goalSelector.addGoal(6, new MoveToCoordGoal(this));
         super.registerGoals();
@@ -595,7 +599,6 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         public AquilaLookControl(Mob mob) {
             super(mob);
         }
-
         @Override
         public void tick() {
         }
@@ -649,7 +652,6 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
                 Vec3 movement = AquilaEntity.this.getDeltaMovement();
                 AquilaEntity.this.setDeltaMovement(movement.add((new Vec3(txd, tyd, tzd)).subtract(movement).scale(0.2)));
             }
-
         }
     }
 }

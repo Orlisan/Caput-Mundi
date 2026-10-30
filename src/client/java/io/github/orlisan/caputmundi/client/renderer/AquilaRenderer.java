@@ -20,7 +20,6 @@ public class AquilaRenderer extends GeoEntityRenderer<@NotNull AquilaEntity, @No
         this.withRenderLayer(new CollettoRenderLayer(this))
                 .withRenderLayer(new ArmorRenderLayer(this));
     }
-
     @Override
     public @NotNull AquilaRenderState createRenderState(@NotNull AquilaEntity animatable, @Nullable Void relatedObject) {
         return new AquilaRenderState();

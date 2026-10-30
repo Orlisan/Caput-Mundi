@@ -76,6 +76,6 @@ public class AttaccoDistanzaGoal extends AquilaGoalConCostruttore {
     public void stop() {
         super.stop();
         entity.distanceAttack = false;
-        entity.setStartDecolloAnim(true);
+       // entity.setStartDecolloAnim(true);
     }
 }

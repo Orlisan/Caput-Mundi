@@ -100,7 +100,7 @@ public class CaputMundi implements ModInitializer {
                                         Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
                                         for (Entity entity : entita) {
                                             if (entity instanceof AquilaEntity aquilaEntity) {
-                                                aquilaEntity.stopAllGoals();
+                                            //    aquilaEntity.stopAllGoals();
                                                 aquilaEntity.modeSullAttenti = true;
                                            }
                                         }
@@ -155,7 +155,12 @@ public class CaputMundi implements ModInitializer {
                             ServerPlayer playerByName = context.server().getPlayerList().getPlayerByName(split[1]);
                             entity.attacca(playerByName);
                         }
-
+                    }else if(split[0].equals("attenta")){
+                        if(split[1].equals("si")) {
+                            entity.modeSullAttenti = true;
+                        }else{
+                            entity.modeSullAttenti = false;
+                        }
                     }
                 }
             });

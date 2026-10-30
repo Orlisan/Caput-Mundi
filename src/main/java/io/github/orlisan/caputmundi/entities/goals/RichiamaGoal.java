@@ -45,6 +45,7 @@ public class RichiamaGoal extends AquilaGoalConCostruttore {
 
     @Override
     public void stop() {
+        super.stop();
         entity.isFlying = false;
         entity.richiama = false;
     }
