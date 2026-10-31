@@ -26,13 +26,17 @@ public final class CaputMundiConstants {
 
     public static final AttachmentType<AquilaEntity> AQUILA_VISUALIZZATA =
             AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila_visualizzata"));
+    public static final AttachmentType<CivitasRomana> CIVITAS_ROMANA =
+            AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "civitas_romana"));
+
     public static final int PACKET_STRING_MAX_LENGTH = 32767;
 
     public static final List<Component> SPLASHES_ROMANI = List.of(
             Component.literal("Veni, vidi, vici").withStyle(Style.EMPTY.withColor(0xC00000)),
             Component.literal("Alea iacta est").withStyle(Style.EMPTY.withColor(0x660033)),
             Component.literal("Memento mori").withStyle(Style.EMPTY.withColor(0x555555)),
-            Component.literal("Carpe diem").withStyle(Style.EMPTY.withColor(0xFFFFFF))
+            Component.literal("Carpe diem").withStyle(Style.EMPTY.withColor(0xFFFFFF)),
+            Component.literal("Ad maiora").withStyle(Style.EMPTY.withColor(0x00CCFF))
     );
     public static GameRule<Integer> AQUILA_VIEW_UPDATE_TICKS/* = registerInteger("aquila_view_update_ticks", GameRuleCategory.MOBS, 20, 0)*/;
     private CaputMundiConstants(){}

@@ -3,6 +3,7 @@ package io.github.orlisan.caputmundi.client;
 import io.github.orlisan.caputmundi.CaputMundi;
 import io.github.orlisan.caputmundi.client.gui.LituusScreen;
 import io.github.orlisan.caputmundi.client.renderer.AquilaRenderer;
+import io.github.orlisan.caputmundi.client.renderer.LegionariusRenderer;
 import io.github.orlisan.caputmundi.client.renderer.PilumRenderer;
 import io.github.orlisan.caputmundi.client.renderer.PlumbataRenderer;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
@@ -80,6 +81,10 @@ public class CaputMundiClient implements ClientModInitializer {
         EntityRenderers.register(
                 CaputMundiEntities.AQUILA,
                 AquilaRenderer::new
+        );
+        EntityRenderers.register(
+                CaputMundiEntities.LEGIONARIUS,
+                LegionariusRenderer::new
         );
         EntityRenderers.register(
                 CaputMundiEntities.PILUM,

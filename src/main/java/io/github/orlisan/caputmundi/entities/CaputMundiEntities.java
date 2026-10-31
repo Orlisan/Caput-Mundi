@@ -24,6 +24,10 @@ public class CaputMundiEntities {
             Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila"),
             EntityType.Builder.of(AquilaEntity::new, MobCategory.CREATURE).sized(1.5f, 0.4f).build(keyOf("aquila"))
     );
+    public static final EntityType<@NotNull Legionarius> LEGIONARIUS = Registry.register(BuiltInRegistries.ENTITY_TYPE,
+            Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "legionarius"),
+            EntityType.Builder.of(Legionarius::new, MobCategory.CREATURE).sized(1.5f, 0.4f).build(keyOf("legionarius"))
+    );
 
     public static final EntityType<@NotNull PilumLanciato> PILUM = register(
             Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "pilum"),
@@ -47,6 +51,7 @@ public class CaputMundiEntities {
 
     public static void register() {
         FabricDefaultAttributeRegistry.register(AQUILA, AquilaEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(LEGIONARIUS, Legionarius.createAttributes());
         BiomeModifications.addSpawn(BiomeSelectors.includeByKey(
                         Biomes.TAIGA,
                         Biomes.SNOWY_TAIGA,

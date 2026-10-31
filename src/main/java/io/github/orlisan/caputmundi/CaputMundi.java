@@ -1,8 +1,10 @@
 package io.github.orlisan.caputmundi;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
+import io.github.orlisan.caputmundi.entities.Legionarius;
 import io.github.orlisan.caputmundi.items.CaputMundiCreativeTab;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -12,11 +14,13 @@ import io.github.orlisan.caputmundi.packets.PlayerDatasPacket;
 import io.github.orlisan.caputmundi.potions.CaputMundiPotions;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -27,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -41,12 +46,44 @@ public class CaputMundi implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        Legio.registerInOnInizialize();
+        ServerTickEvents.END_SERVER_TICK.register((server -> Legio.legios.forEach(legio -> legio.tick(server.getLevel(legio.base.dimension())))));
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
         CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext, commandSelection) ->
         {
+            LegioCommand.register(commandDispatcher);
+
             //DEBUG
+  /*          commandDispatcher.register(Commands.literal("legio")
+                    .then(Commands.argument("legionari", EntityArgument.entities())
+                            .then(Commands.argument("id", IntegerArgumentType.integer(0)))
+                            .then(Commands.literal("create")
+                                    .executes(context -> {
+                                        var legIds = new ArrayList<String>();
+                                        for (Entity entity : EntityArgument.getEntities(context, "legionari")) {
+                                            if (entity instanceof Legionarius leg) legIds.add(leg.getStringUUID());
+                                        }
+                                        Legio.create(IntegerArgumentType.getInteger(context, "id"), legIds.getFirst(), BlockPos.ZERO, context.getSource().getLevel(), legIds.toArray(new String[]{}));
+                                        return 1;
+                                    }))
+                            .then(Commands.literal("moveto")
+                                    .executes(context -> {
+                                        Legio.getLegio(IntegerArgumentType.getInteger(context, "id"))
+                                                .moveTo(
+                                                        context.getSource().getLevel(),
+                                                        new BlockPos(IntegerArgumentType.getInteger(context, "x"),
+                                                                IntegerArgumentType.getInteger(context, "y"),
+                                                                IntegerArgumentType.getInteger(context, "z"))
+                                                        , IntegerArgumentType.getInteger(context, "y")
+                                                );
+                                        return 1;
+                                    }))
+                            .then(Commands.argument("x", IntegerArgumentType.integer()))
+                            .then(Commands.argument("y", IntegerArgumentType.integer()))
+                            .then(Commands.argument("z", IntegerArgumentType.integer()))
+                    )); */
             commandDispatcher.register(Commands.literal("aquilagoals")
                     .then(Commands.argument("aquile", EntityArgument.entities())
                             .then(Commands.literal("attaccoDistanza")
@@ -80,29 +117,29 @@ public class CaputMundi implements ModInitializer {
                                         return 1;
                                     }))
                             .then(Commands.literal("dimmigoal")
-                            .executes(context -> {
-                                try {
-                                    Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
-                                    context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquile: "+entita.size()));
-                                    for (Entity entity : entita) {
-                                        if (entity instanceof AquilaEntity aquilaEntity) {
-                                            context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquila: " + aquilaEntity.getId() + " goal attivo: " + aquilaEntity.getGoalSelector().getAvailableGoals().stream().filter(goal -> goal.isRunning()).toList().getFirst().getGoal().getClass().getSimpleName()).withColor(TextColor.YELLOW));
+                                    .executes(context -> {
+                                        try {
+                                            Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
+                                            context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquile: " + entita.size()));
+                                            for (Entity entity : entita) {
+                                                if (entity instanceof AquilaEntity aquilaEntity) {
+                                                    context.getSource().getPlayer().sendSystemMessage(Component.literal("Aquila: " + aquilaEntity.getId() + " goal attivo: " + aquilaEntity.getGoalSelector().getAvailableGoals().stream().filter(goal -> goal.isRunning()).toList().getFirst().getGoal().getClass().getSimpleName()).withColor(TextColor.YELLOW));
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            IO.println("Eccezione: " + e);
+                                        } finally {
+                                            return 1;
                                         }
-                                    }
-                                }catch(Exception e) {
-                                    IO.println("Eccezione: "+e);
-                                }finally{
-                                    return 1;
-                                }
-                            }))
+                                    }))
                             .then(Commands.literal("sullattenti")
                                     .executes(context -> {
                                         Collection<? extends Entity> entita = EntityArgument.getEntities(context, "aquile");
                                         for (Entity entity : entita) {
                                             if (entity instanceof AquilaEntity aquilaEntity) {
-                                            //    aquilaEntity.stopAllGoals();
+                                                //    aquilaEntity.stopAllGoals();
                                                 aquilaEntity.modeSullAttenti = true;
-                                           }
+                                            }
                                         }
                                         return 1;
                                     }))
@@ -130,23 +167,23 @@ public class CaputMundi implements ModInitializer {
                     } else if (split[0].equals("recall")) {
                         entity.stopAllGoals();
                         entity.startRichiama();
-                    }else if(split[0].equals("startsend")) {
+                    } else if (split[0].equals("startsend")) {
                         entity.startSendVista = true;
-                    }else if(split[0].equals("stopsend")) {
+                    } else if (split[0].equals("stopsend")) {
                         entity.startSendVista = false;
-                    }else if(split[0].equals("setfalse")) {
-                        if(split[1].equals("decollo")) {
+                    } else if (split[0].equals("setfalse")) {
+                        if (split[1].equals("decollo")) {
                             entity.setStartDecolloAnim(false);
-                        }else if(split[1].equals("atterraggio")) {
+                        } else if (split[1].equals("atterraggio")) {
                             entity.setStartAtterraggioAnim(false);
                         }
-                    }else if(split[0].equals("moveto")) {
+                    } else if (split[0].equals("moveto")) {
                         entity.stopAllGoals();
                         entity.coordsToMove = new Vec3(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
-                    }else if(split[0].equals("startruota")) {
+                    } else if (split[0].equals("startruota")) {
                         entity.stopAllGoals();
                         entity.startRuotaInCerchio();
-                    }else if(split[0].equals("attack")) {
+                    } else if (split[0].equals("attack")) {
                         entity.stopAllGoals();
                         if (Objects.equals(split[1], "stopattack")) {
                             entity.setTarget(null);
@@ -155,10 +192,10 @@ public class CaputMundi implements ModInitializer {
                             ServerPlayer playerByName = context.server().getPlayerList().getPlayerByName(split[1]);
                             entity.attacca(playerByName);
                         }
-                    }else if(split[0].equals("attenta")){
-                        if(split[1].equals("si")) {
+                    } else if (split[0].equals("attenta")) {
+                        if (split[1].equals("si")) {
                             entity.modeSullAttenti = true;
-                        }else{
+                        } else {
                             entity.modeSullAttenti = false;
                         }
                     }

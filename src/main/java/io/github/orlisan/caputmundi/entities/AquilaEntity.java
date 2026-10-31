@@ -70,7 +70,7 @@ import java.util.*;
 import static io.github.orlisan.caputmundi.CaputMundi.LOGGER;
 
 @SuppressWarnings("NullableProblems")
-public class AquilaEntity extends PathfinderMob implements GeoEntity {
+public class AquilaEntity extends PathfinderMob implements GeoEntity, MoveToCoordGoal.MovableToCoord {
     public static final RawAnimation DECOLLO_ANIM = RawAnimation.begin()
             .thenPlay("animazione_decollo").thenLoop("animazione_volo");
     public static final RawAnimation ANIMAZIONE_ATTERRAGGIO = RawAnimation.begin()
@@ -107,6 +107,16 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
     private static final EntityDataAccessor<Boolean> VOLA =
             SynchedEntityData.defineId(AquilaEntity.class, EntityDataSerializers.BOOLEAN);
     public ThingsToDoAfterDecollo cosaDaFare;
+
+    @Override
+    public Vec3 coordsToMove() {
+        return coordsToMove;
+    }
+
+    @Override
+    public void setCoordsToMove(Vec3 move) {
+        coordsToMove = move;
+    }
 
 
     public enum ThingsToDoAfterDecollo {
@@ -584,7 +594,7 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity {
         this.goalSelector.addGoal(4, new DecolloGoal(this));
         this.goalSelector.addGoal(5, new AquilaTemptGoal(this, 2.5, (item) -> item.getItem() == ADDOMESTICATION_ITEM, false));
         this.goalSelector.addGoal(5, new RuotaInCerchioGoal(this));
-        this.goalSelector.addGoal(6, new MoveToCoordGoal(this));
+        this.goalSelector.addGoal(6, new MoveToCoordGoal(this, 2.0f));
         super.registerGoals();
     }
 
