@@ -123,6 +123,7 @@ public class Legio {
     }
     protected void guardaLoStesso(Entity nemico) {
         legionari.forEach( leg -> leg.entityToLook = nemico);
+        var x = 0;
         /*Vec2 centro = calcolaCentro();
         double r = centro.y-nemico.position().z;
         double tanGrossa = centro.x - nemico.position().x;
