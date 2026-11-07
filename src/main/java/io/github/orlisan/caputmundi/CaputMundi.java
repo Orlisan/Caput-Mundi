@@ -1,10 +1,8 @@
 package io.github.orlisan.caputmundi;
 
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.github.orlisan.caputmundi.blocks.CaputMundiBlocks;
 import io.github.orlisan.caputmundi.entities.AquilaEntity;
 import io.github.orlisan.caputmundi.entities.CaputMundiEntities;
-import io.github.orlisan.caputmundi.entities.Legionarius;
 import io.github.orlisan.caputmundi.items.CaputMundiCreativeTab;
 import io.github.orlisan.caputmundi.items.CaputMundiItems;
 import io.github.orlisan.caputmundi.packets.AquilaVistaMobsPacket;
@@ -20,7 +18,6 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
@@ -31,7 +28,6 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -46,7 +42,7 @@ public class CaputMundi implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Legio.registerInOnInizialize();
+        Legio.register();
         ServerTickEvents.END_SERVER_TICK.register((server -> Legio.legios.forEach(legio -> legio.tick(server.getLevel(legio.base.dimension())))));
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.

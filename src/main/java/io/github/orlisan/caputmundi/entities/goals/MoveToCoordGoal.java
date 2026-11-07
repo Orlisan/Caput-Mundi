@@ -33,7 +33,7 @@ public class MoveToCoordGoal extends Goal {
         if (tickCounter == 10) tickCounter = 0;
         if (entity.position().distanceTo(entity.coordsToMove()) < minDistance) entity.setCoordsToMove(AquilaEntity.NO_MOVES);
         else if (tickCounter == 0)
-            entity.getNavigation().moveTo(entity.coordsToMove().x, entity.coordsToMove().y, entity.coordsToMove().z, 1.5f);
+            entity.getNavigation().moveTo(entity.coordsToMove().x, entity.coordsToMove().y, entity.coordsToMove().z, entity.velocity());
         super.tick();
     }
 
@@ -42,5 +42,6 @@ public class MoveToCoordGoal extends Goal {
         Vec3 coordsToMove();
         void setCoordsToMove(Vec3 move);
         Vec3 position();
+        double velocity();
     }
 }

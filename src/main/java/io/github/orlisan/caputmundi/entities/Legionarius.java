@@ -6,22 +6,21 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.util.GeckoLibUtil;
 import io.github.orlisan.caputmundi.Legio;
 import io.github.orlisan.caputmundi.entities.goals.MoveToCoordGoal;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.NonNull;
 
 public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoordGoal.MovableToCoord {
 
     protected Legionarius(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
     }
-
+    public Entity entityToLook = null;
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new MoveToCoordGoal(this, 1f));
@@ -30,10 +29,31 @@ public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoord
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 30.0F).add(Attributes.ATTACK_DAMAGE, 3.0).add(Attributes.MOVEMENT_SPEED, 0.3);
     }
-
+    public int legioId = -1;
     @Override
     public boolean removeWhenFarAway(double distSqr) {
         return false;
+    }
+
+    @Override
+    protected void actuallyHurt(ServerLevel level, DamageSource source, float dmg) {
+        super.actuallyHurt(level, source, dmg);
+        if(source.getEntity() instanceof LivingEntity entity) {
+            Legio legio = Legio.getLegio(legioId);
+            if(legio != null) legio.addNemico(entity);
+        }
+    }
+
+    @Override
+    public void remove(@NonNull RemovalReason reason) {
+        if(legioId != -1) {
+            Legio legio = Legio.getLegio(legioId);
+            if (legio != null) {
+                legio.legionari.remove(this);
+                legio.legionariUUID.remove(this.getStringUUID());
+            }
+        }
+        super.remove(reason);
     }
 
     public boolean shouldLoadChunks = true;
@@ -46,9 +66,27 @@ public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoord
         if(shouldLoadChunks && level() instanceof ServerLevel serverLevel && tickCounter == 0) {
             serverLevel.getChunkSource().addTicketWithRadius(Legio.LEGIO, this.chunkPosition(), 2);
         }
+        if(entityToLook != null) this.getLookControl().setLookAt(entityToLook);
         super.tick();
     }
-
+    public int getMaxDurabilita() {
+        return this.getItemBySlot(EquipmentSlot.HEAD).getMaxDamage()+
+                this.getItemBySlot(EquipmentSlot.FEET).getMaxDamage()+
+                this.getItemBySlot(EquipmentSlot.OFFHAND).getMaxDamage()+
+                this.getItemBySlot(EquipmentSlot.MAINHAND).getMaxDamage()+
+                this.getItemBySlot(EquipmentSlot.LEGS).getMaxDamage()+
+                this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage();
+    }
+    public int getDurabilita() {
+        int durabilita = 0;
+         durabilita += this.getItemBySlot(EquipmentSlot.HEAD).getMaxDamage() - this.getItemBySlot(EquipmentSlot.HEAD).getDamageValue();
+         durabilita += this.getItemBySlot(EquipmentSlot.CHEST).getMaxDamage() - this.getItemBySlot(EquipmentSlot.CHEST).getDamageValue();
+        durabilita += this.getItemBySlot(EquipmentSlot.LEGS).getMaxDamage() - this.getItemBySlot(EquipmentSlot.LEGS).getDamageValue();
+        durabilita += this.getItemBySlot(EquipmentSlot.FEET).getMaxDamage() - this.getItemBySlot(EquipmentSlot.FEET).getDamageValue();
+        durabilita += this.getItemBySlot(EquipmentSlot.MAINHAND).getMaxDamage() - this.getItemBySlot(EquipmentSlot.MAINHAND).getDamageValue();
+        durabilita += this.getItemBySlot(EquipmentSlot.OFFHAND).getMaxDamage() - this.getItemBySlot(EquipmentSlot.OFFHAND).getDamageValue();
+        return durabilita;
+    }
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
 
@@ -69,5 +107,10 @@ public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoord
     @Override
     public void setCoordsToMove(Vec3 move) {
         this.coord = move;
+    }
+    public double velocity = 1.5f;
+    @Override
+    public double velocity() {
+        return velocity;
     }
 }

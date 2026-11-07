@@ -29,7 +29,8 @@ public class LegioCommand {
                 .then(Commands.literal("moveto")
                         .then(Commands.argument("id", IntegerArgumentType.integer(0))
                                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                                        .executes(LegioCommand::moveTo))))
+                                        .then(Commands.argument("mob", EntityArgument.entity())
+                                              .executes(LegioCommand::moveTo)))))
                 .then(Commands.literal("setinactive")
                         .then(Commands.argument("id", IntegerArgumentType.integer(0))
                                 .executes(LegioCommand::setInactive)))
@@ -81,7 +82,13 @@ public class LegioCommand {
         ServerLevel level = levelOf(ctx, legio);
         if (level == null) return 0;
         BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
-        legio.moveTo(level, pos, pos.getY());
+        try {
+            Entity entity = EntityArgument.getEntity(ctx, "mob");
+            legio.moveTo(level, pos, pos.getY(), entity);
+        } catch (CommandSyntaxException e) {
+            ctx.getSource().sendFailure(Component.literal("Problema: "+e));
+            return 0;
+        }
         ctx.getSource().sendSuccess(() -> Component.literal("Ordine moveto inviato a " + pos.toShortString()), false);
         return 1;
     }
@@ -96,14 +103,14 @@ public class LegioCommand {
         return 1;
     }
 
-    private static int info(CommandContext<CommandSourceStack> ctx) {
-        Legio legio = find(ctx);
-        if (legio == null) return 0;
-        ServerLevel level = levelOf(ctx, legio);
-        if (level == null) return 0;
-        legio.refreshLegio(level); // così il conteggio è quello reale, non la cache vecchia
-        String stato = legio.tickCounter >= 0 ? "in risveglio (" + legio.tickCounter + "/100)"
-                : legio.inactivePos != null ? "inattiva"
+        private static int info(CommandContext<CommandSourceStack> ctx) {
+            Legio legio = find(ctx);
+            if (legio == null) return 0;
+            ServerLevel level = levelOf(ctx, legio);
+            if (level == null) return 0;
+            legio.refreshLegio(level); // così il conteggio è quello reale, non la cache vecchia
+            String stato = legio.tickCounter >= 0 ? "in risveglio (" + legio.tickCounter + "/100)"
+                    : legio.inactivePos != null ? "inattiva"
                 : "attiva";
         String msg = "Legio " + legio.legioId
                      + " | stato: " + stato

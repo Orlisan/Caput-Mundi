@@ -26,7 +26,7 @@ public class CaputMundiEntities {
     );
     public static final EntityType<@NotNull Legionarius> LEGIONARIUS = Registry.register(BuiltInRegistries.ENTITY_TYPE,
             Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "legionarius"),
-            EntityType.Builder.of(Legionarius::new, MobCategory.CREATURE).sized(1.5f, 0.4f).build(keyOf("legionarius"))
+            EntityType.Builder.of(Legionarius::new, MobCategory.CREATURE).sized(0.5f, 1.34f).build(keyOf("legionarius"))
     );
 
     public static final EntityType<@NotNull PilumLanciato> PILUM = register(

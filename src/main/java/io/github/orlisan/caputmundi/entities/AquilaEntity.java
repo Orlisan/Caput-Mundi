@@ -118,6 +118,11 @@ public class AquilaEntity extends PathfinderMob implements GeoEntity, MoveToCoor
         coordsToMove = move;
     }
 
+    @Override
+    public double velocity() {
+        return 1.5f;
+    }
+
 
     public enum ThingsToDoAfterDecollo {
         RUOTAINCERCHIO,

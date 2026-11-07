@@ -13,7 +13,7 @@ import org.jspecify.annotations.Nullable;
 public class LegionariusModel extends GeoModel<@NotNull Legionarius> {
     @Override
     public @NotNull Identifier getModelResource(@NotNull GeoRenderState geoRenderState) {
-        return i("aquila");
+        return i("legionarius");
     }
 
     Identifier i(String path) {
@@ -22,12 +22,12 @@ public class LegionariusModel extends GeoModel<@NotNull Legionarius> {
 
     @Override
     public @NotNull Identifier getTextureResource(@NotNull GeoRenderState geoRenderState) {
-        return i("textures/entity/aquila.png");
+        return i("textures/entity/legionarius.png");
     }
 
 
     @Override
     public @NotNull Identifier getAnimationResource(Legionarius aquilaEntity) {
-        return i("aquila");
+        return i("legionarius");
     }
 }

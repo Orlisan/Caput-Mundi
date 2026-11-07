@@ -26,7 +26,7 @@ public final class CaputMundiConstants {
 
     public static final AttachmentType<AquilaEntity> AQUILA_VISUALIZZATA =
             AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "aquila_visualizzata"));
-    public static final AttachmentType<CivitasRomana> CIVITAS_ROMANA =
+    public static final AttachmentType<DignitasRomana> DIGNITAS_ROMANA =
             AttachmentRegistry.create(Identifier.fromNamespaceAndPath(CaputMundi.MOD_ID, "civitas_romana"));
 
     public static final int PACKET_STRING_MAX_LENGTH = 32767;
