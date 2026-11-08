@@ -11,10 +11,12 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
+import static java.lang.Math.PI;
 import static net.minecraft.world.level.Level.OVERWORLD;
 
 public class Legio {
@@ -117,58 +119,104 @@ public class Legio {
             setActive(level, new MovActivity(level, pos, y, mobDaGuardare));
             return;
         }
+        reorder();
         // legionari.add(new Legionarius(null, null))
         guardaLoStesso(mobDaGuardare);
-        disponi(level, pos, y, 1.0, 1.5f);
+        disponi(level, pos, y, 1.0, 1.5f, mobDaGuardare);
     }
     protected void guardaLoStesso(Entity nemico) {
         legionari.forEach( leg -> leg.entityToLook = nemico);
-        var x = 0;
-        /*Vec2 centro = calcolaCentro();
-        double r = centro.y-nemico.position().z;
-        double tanGrossa = centro.x - nemico.position().x;
-        double tan = tanGrossa/r;
-        double incB = Math.atan(tan*Math.PI/180)/Math.PI*180;
-        double inc = 0;
-        if(tanGrossa > 0) {
-            if(incB > 0) inc+=90;
-        }else{
-            inc+=180;
-            if(incB > 0) inc+=90;
-        }
-        inc+=Math.abs(incB);
-        final double finalInc = inc;
+      /*  final double finalInc = getFinalInc(nemico);
         legionari.forEach(leg -> {
             leg.setYRot((float) finalInc);
             leg.setYBodyRot((float) finalInc);
             leg.setYHeadRot((float) finalInc);
         });*/
     }
-  /*  private Vec2 calcolaCentro() {
-        Vec2 xmzm = new Vec2(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
-        Vec2 xmzM = new Vec2(Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY);
-        Vec2 xMzm = new Vec2(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
-        Vec2 xMzM = new Vec2(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
-        for(Legionarius leg: legionari) {
-            Vec3 p = leg.position();
-            if(p.x < xmzm.x && p.z < xmzm.y) xmzm = new Vec2((float) p.x, (float) p.z);
-            if(p.x > xmzM.x && p.z < xmzM.y) xmzM = new Vec2((float) p.x, (float) p.z);
-            if(p.x < xMzm.x && p.z > xMzm.y) xMzm = new Vec2((float) p.x, (float) p.z);
-            if(p.x > xMzM.x && p.z > xMzM.y) xMzM = new Vec2((float) p.x, (float) p.z);
-        }
-        return new Vec2((xmzm.x+xmzM.x+xMzm.x+xMzM.x)/4, (xmzm.y+xmzM.y+xMzm.y+xMzM.y)/4);
-    }*/
-    protected void disponi(ServerLevel level, BlockPos pos, int y, double distanza, double velocita) {
-        for(int i = 0; i < legionari.size();i++) {
-            var leg = legionari.get(i);
-            double x = (int) (pos.getX() + 4*distanza - ((double) i % 8))*distanza;
-            double z = pos.getZ() + 5*distanza - ((double) (i - (i % 10)) /10)*distanza;
-            leg.coord = new Vec3(x, findY(level, x, z, y), z);
-            leg.velocity = velocita;
-        }
+
+    private double getFinalInc(Entity nemico, Vec2 centro) {
+    //    Vec2 centro = calcolaCentro();
+        double r = centro.y- nemico.position().z;
+        double tanGrossa = centro.x - nemico.position().x;
+        if(r == 0 && tanGrossa == 0) return 0;
+        double tan = tanGrossa/r;
+        double inc = Math.abs(Math.atan(tan/* * PI/180*/)/ PI*180);
+        if(r < 0) inc = 180-inc;
+        if(tanGrossa > 0) inc = -inc;
+        return inc;
     }
 
-    int findY(ServerLevel level, double x, double z, int maxY) {
+    private Vec2 calcolaCentro() {
+        if(legionari.isEmpty()) return new Vec2(Float.NaN, Float.NaN);
+        double xMin = Double.POSITIVE_INFINITY, zMin = Double.POSITIVE_INFINITY, xMax = Double.NEGATIVE_INFINITY,
+                zMax = Double.NEGATIVE_INFINITY;
+        for(Legionarius leg: legionari) {
+            Vec3 p = leg.position();
+            if(p.x < xMin) xMin = p.x;
+            if(p.z < zMin) zMin = p.z;
+            if(p.x > xMax) xMax = p.x;
+            if(p.z > zMax) zMax = p.z;
+        }
+        return new Vec2((float) ((xMin+xMax)/2), (float) ((zMin+zMax)/2));
+    }
+    void trovaInclinazioneOriginale(Legionarius leg, Vec2 centro) {
+        Vec3 pos = leg.coord;
+        double distanzaXZ = distanzaDalCentro(centro, pos);
+        if(distanzaXZ < 0.01) {leg.rot = 0; return ;}
+        double arcoseno = (Math.asin(Math.clamp((pos.x()-centro.x) / distanzaXZ, -1, 1)) * 180) / Math.PI;
+        double inclinazioneFinale;
+        if (arcoseno < 0) {
+            if (pos.z()-centro.y > 0) {
+                inclinazioneFinale = -180 - arcoseno + 360;
+            } else {
+                inclinazioneFinale = arcoseno + 360;
+            }
+        } else {
+            if (pos.z()-centro.y > 0) {
+                inclinazioneFinale = 180 - arcoseno;
+            } else {
+                inclinazioneFinale = arcoseno;
+            }
+        }
+        leg.rot = inclinazioneFinale;
+    }
+
+    protected void disponi(ServerLevel level, BlockPos pos, int y, double distanza, double velocita, Entity daGuardare) {
+        for(int i = 0; i < file.size();i++) {
+            var fila = file.get(i);
+            double z = (int) (pos.getZ() + 3*distanza - i)*distanza;
+            for(int j = 0; j < fila.size(); j++) {
+                Legionarius leg = fila.get(j);
+                double x = pos.getX() + 3 * distanza - /*((double) (j - (j % 6)) / 6)*/j * distanza;
+                leg.coord = new Vec3(x, findY(level, x, z, y), z);
+                leg.velocity = velocita;
+            }
+        }
+        if(daGuardare != null) {
+            Vec2 centro = /*calcolaCentro()*/ new Vec2(pos.getX(), pos.getZ());
+            double inclinazioneGlobale = getFinalInc(daGuardare, centro);
+            for (Legionarius leg : legionari) {
+                trovaInclinazioneOriginale(leg, centro);
+                double inclinazione = inclinazioneGlobale+leg.rot;
+                double distanzaCentro = distanzaDalCentro(centro, leg.coord);
+                double sin = distanzaCentro*Math.sin(inclinazione*PI/180);
+                double cos = distanzaCentro*Math.cos(inclinazione*PI/180);
+                double x = centro.x + sin;
+                double z = centro.y - cos;
+                leg.coord = new Vec3(x, findY(level, x, z, y), z);
+            }
+        }
+    }
+    public double distanzaDalCentro(Vec2 centro, Vec3 position) {
+        return Math.hypot(getAbs(centro.x, position.x), getAbs(centro.y, position.z));
+    }
+
+    private static double getAbs(double centro, double position) {
+        return Math.abs(centro - position);
+    }
+
+    int findY(ServerLevel level, double xb, double zb, int maxY) {
+        double x = Math.round(xb), z = Math.round(zb);
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, maxY, z);
         for(int i = maxY; i > level.getMinY(); i-- ) {
             pos.setY(i);

@@ -37,11 +37,18 @@ public class MoveToCoordGoal extends Goal {
         super.tick();
     }
 
+    @Override
+    public void stop() {
+        super.stop();
+        entity.onStop();
+    }
+
     public interface MovableToCoord {
         PathNavigation getNavigation();
         Vec3 coordsToMove();
         void setCoordsToMove(Vec3 move);
         Vec3 position();
         double velocity();
+        default void onStop() {}
     }
 }

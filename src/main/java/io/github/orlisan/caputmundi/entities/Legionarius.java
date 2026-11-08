@@ -36,6 +36,11 @@ public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoord
     }
 
     @Override
+    public void onStop() {
+        this.entityToLook = null;
+    }
+
+    @Override
     protected void actuallyHurt(ServerLevel level, DamageSource source, float dmg) {
         super.actuallyHurt(level, source, dmg);
         if(source.getEntity() instanceof LivingEntity entity) {
@@ -59,6 +64,7 @@ public class Legionarius extends PathfinderMob implements GeoEntity, MoveToCoord
     public boolean shouldLoadChunks = true;
     public Vec3 coord = AquilaEntity.NO_MOVES;
     long tickCounter = 0L;
+    public double rot = 0;
     @Override
     public void tick() {
         tickCounter++;
